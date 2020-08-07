@@ -8,7 +8,9 @@
     "serverstart": "DEBUG=backend:* npm run devstart"
   },
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
     "argon2": "^0.26.2",
+    "body-parser": "^1.19.0",
     "cookie-parser": "~1.4.4",
     "crypto": "^1.0.1",
     "debug": "~2.6.9",

@@ -3,17 +3,23 @@ const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
+const { registerValidation, loginValidation } = require('../validation');
 
 const router = express.Router();
 
-router.get('/register', async (req, res) => {
+router.post('/register', async (req, res) => {
+  // validating data
+  const { error } = registerValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  // checking if user is already registered
   const emailExists = await User.findOne({ email: req.body.email });
   if (emailExists) return res.status(400).send('Email already exists!');
 
   const salt = 10;
-  const passwordHashed = await argon2.hash(req.body.password, { salt });
+  const passwordHashed = await argon2.hash(req.body.password, salt);
 
-  const user = await new User({
+  const user = new User({
     name: req.body.name,
     email: req.body.email,
     password: passwordHashed,
@@ -21,19 +27,26 @@ router.get('/register', async (req, res) => {
 
   try {
     const savedUser = await user.save();
-    res.send({ user: user.__id });
+    res.send({ user: user._id });
   } catch (err) {
     res.status(400).send(err);
   }
 });
 
 router.post('/login', async (req, res) => {
+  // validating data
+  const { error } = loginValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  // checking if user is already registered
   const user = await User.findOne({ email: req.body.email });
   if (!user) return res.status(400).send('Email or password is invalid!');
 
+  // verify password
   const correctPassword = await argon2.verify(user.password, req.body.password);
   if (!correctPassword) return res.status(400).send('Email or passsword is invalid!');
 
+  // create and assign token
   const token = jwt.sign({ _id: user.__id }, process.env.TOKEN_SECRET);
   res.header('auth-token', token).send(token);
 });
