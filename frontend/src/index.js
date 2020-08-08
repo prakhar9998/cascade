@@ -5,11 +5,12 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 import Login from "./components/Login";
+import Register from './components/Register';
 
 ReactDOM.render(
   <React.StrictMode>
     {/* <App /> */}
-    <Login />
+    <Register />
   </React.StrictMode>,
   document.getElementById('root')
 );

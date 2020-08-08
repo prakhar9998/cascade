@@ -4,11 +4,22 @@ const validEmailRegex = RegExp(
   /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 );
 
-const Login = (props) => {
+const Register = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({email: "", password: ""});
+  const [errors, setErrors] = useState({name: "", email: "", password: ""});
+
+  const onChangeName = (e) => {
+    const name = e.target.value;
+    setErrors(prevState => ({
+      ...prevState,
+      name: (name.length < 6) ? "Username must be atleast 8 character long!" : ""
+    }));
+
+    setName(name);
+  }
 
   const onChangeEmail = (e) => {
     const email = e.target.value;
@@ -16,7 +27,7 @@ const Login = (props) => {
       ...prevState,
       email: validEmailRegex.test(email) ? "" : "E-mail is invalid!"
     }));
-    
+
     setEmail(email);
   }
 
@@ -26,7 +37,7 @@ const Login = (props) => {
     // TODO: consistend password validation with validation in backend
     setErrors(prevState => ({
       ...prevState,
-      password: (password.length < 8) ? "Password must be 8 characters long!" : ""
+      password: (password.length < 8) ? "Password must be atleast 8 characters long!" : ""
     }));
 
     setPassword(password);
@@ -40,7 +51,7 @@ const Login = (props) => {
       if (value.length > 0) valid = false;
     });
 
-    if (email === "" || password === "") valid = false;
+    if (name === "" || email === "" || password === "") valid = false;
 
     // TODO: POST request to the API
     // TODO: change 'loading' state
@@ -55,12 +66,17 @@ const Login = (props) => {
     <div>
       <form onSubmit={handleLogin}>
         <div>
+          <label htmlFor="name">Name</label>
+          <input type="text" name="name" value={name} onChange={onChangeName} />
+          {errors.name &&
+            <span>{errors.name}</span>}
+        </div>
+        <div>
           <label htmlFor="email">E-mail</label>
           <input type="email" name="email" value={email} onChange={onChangeEmail} />
           {errors.email &&
           <span>{errors.email}</span>}
         </div>
-        
         <div>
           <label htmlFor="password">Password</label>
           <input type="password" name="password" value={password} onChange={onChangePassword} />
@@ -73,4 +89,4 @@ const Login = (props) => {
   )
 }
 
-export default Login;
+export default Register;
