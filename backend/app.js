@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 const authRouter = require('./routes/auth');
+const dashboardRouter = require('./routes/dashboard');
+const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 
@@ -29,5 +31,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', authRouter);
+app.use('/api', dashboardRouter);
+
+// middleware for handling errors
+app.use(errorHandler);
 
 module.exports = app;

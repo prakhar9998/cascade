@@ -4,10 +4,12 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 const { registerValidation, loginValidation } = require('../validation');
+const asynhHandler = require('../middlewares/async');
+const asyncHandler = require('../middlewares/async');
 
 const router = express.Router();
 
-router.post('/register', async (req, res) => {
+router.post('/register', asyncHandler(async (req, res, next) => {
   // validating data
   const { error } = registerValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -27,13 +29,13 @@ router.post('/register', async (req, res) => {
 
   try {
     const savedUser = await user.save();
-    res.send({ user: user._id });
+    return res.send({ user: savedUser._id });
   } catch (err) {
-    res.status(400).send(err);
+    return res.status(400).send(err);
   }
-});
+}));
 
-router.post('/login', async (req, res) => {
+router.post('/login', asyncHandler(async (req, res) => {
   // validating data
   const { error } = loginValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -48,7 +50,7 @@ router.post('/login', async (req, res) => {
 
   // create and assign token
   const token = jwt.sign({ _id: user.__id }, process.env.TOKEN_SECRET);
-  res.header('auth-token', token).send(token);
-});
+  return res.header('auth-token', token).send(token);
+}));
 
 module.exports = router;
