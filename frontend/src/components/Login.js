@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import axios from 'axios';
+
+import API_URL from "../config/config";
 
 const validEmailRegex = RegExp(
-  /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 );
 
 const Login = (props) => {
@@ -9,6 +12,7 @@ const Login = (props) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({email: "", password: ""});
+  const [message, setMessage] = useState("");
 
   const onChangeEmail = (e) => {
     const email = e.target.value;
@@ -42,12 +46,34 @@ const Login = (props) => {
 
     if (email === "" || password === "") valid = false;
 
-    // TODO: POST request to the API
-    // TODO: change 'loading' state
     if (valid) {
-      console.log("form is valid");
+      setLoading(true);
+      axios.post(API_URL + '/api/login', {
+        email: email,
+        password: password
+      })
+      .then((res) => {
+        // TODO: save token
+        setLoading(false);
+        console.log("response", res);
+        setMessage("Successfully logged in!");
+      })
+      .catch((err) => {
+        if (err.response) {
+          // server responded with error
+          setMessage(err.response.data.message);
+        } else if (err.request) {
+          // server did not respond
+          setMessage("Please check your network connectivity.");
+        } else {
+          // something went wrong
+          setMessage("Something went wrong!");
+        }
+        setLoading(false);
+      });
     } else {
-      console.log("form is invalid");
+      setMessage("Please complete the form.");
+      console.log("form is invalid")
     }
   }
 
@@ -69,6 +95,10 @@ const Login = (props) => {
         </div>
         <input type="submit" value="login"/>
       </form>
+      {loading && 
+        <span>Loading...</span>}
+      {message &&
+        <span>{message}</span>}
     </div>
   )
 }

@@ -4,13 +4,9 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-import Login from "./components/Login";
-import Register from './components/Register';
-
 ReactDOM.render(
   <React.StrictMode>
-    {/* <App /> */}
-    <Register />
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );

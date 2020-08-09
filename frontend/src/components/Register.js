@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import API_URL from "../config/config";
 import axios from 'axios';
 
+import API_URL from "../config/config";
+
 const validEmailRegex = RegExp(
-  /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 );
 
 const Register = (props) => {
@@ -12,7 +13,7 @@ const Register = (props) => {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({name: "", email: "", password: ""});
-  const [errorMsg, setErrorMsg] = useState("");
+  const [message, setMessage] = useState("");
 
   const onChangeName = (e) => {
     const name = e.target.value;
@@ -55,11 +56,12 @@ const Register = (props) => {
     });
 
     if (name === "" || email === "" || password === "") valid = false;
-
-    setLoading(true);
-
+    
     if (valid) {
+      setLoading(true);
       console.log("form is valid");
+      setMessage("Registering account...");
+
       axios.post(API_URL + '/api/register', {
         name: name,
         email: email,
@@ -67,21 +69,24 @@ const Register = (props) => {
       })
       .then((res) => {
         setLoading(false);
-        setErrorMsg("");
+        console.log("response", res);
+        setMessage("Account registered successfully.");
       })
-      .catch((error) => {
-        if (error.response) {
+      .catch((err) => {
+        if (err.response) {
           // server responded with an error
-          setErrorMsg(error.response.data.message);
-        } else if (error.request) {
+          setMessage(err.response.data.message);
+        } else if (err.request) {
           // server did not respond
-          setErrorMsg("Please check your network connectivity");
+          setMessage("Please check your network connectivity.");
         } else {
           // literally something went wrong
-          setErrorMsg("Something went wrong!");
+          setMessage("Something went wrong!");
         }
+        setLoading(false);
       });
     } else {
+      setMessage("Please complete the form.");
       console.log("form is invalid");
     }
   }
@@ -107,10 +112,12 @@ const Register = (props) => {
           {errors.password &&
             <span>{errors.password}</span>}
         </div>
-        <input type="submit" value="login"/>
+        <input type="submit" value="Register"/>
       </form>
-      {errorMsg &&
-        <span><h2>{errorMsg}</h2></span>}
+      {loading && 
+        <span>Loading...</span>}
+      {message &&
+        <span>{message}</span>}
     </div>
   )
 }

@@ -42,11 +42,11 @@ router.post('/login', asyncHandler(async (req, res) => {
 
   // checking if user is already registered
   const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send('Email or password is invalid!');
+  if (!user) return res.status(400).send({ message: 'Email or password is invalid!' });
 
   // verify password
   const correctPassword = await argon2.verify(user.password, req.body.password);
-  if (!correctPassword) return res.status(400).send('Email or passsword is invalid!');
+  if (!correctPassword) return res.status(400).send({ message: 'Email or passsword is invalid!' });
 
   // create and assign token
   const token = jwt.sign({ _id: user.__id }, process.env.TOKEN_SECRET);
