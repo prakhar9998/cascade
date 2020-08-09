@@ -12,11 +12,11 @@ const router = express.Router();
 router.post('/register', asyncHandler(async (req, res, next) => {
   // validating data
   const { error } = registerValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).send(error.details[0]);
 
   // checking if user is already registered
   const emailExists = await User.findOne({ email: req.body.email });
-  if (emailExists) return res.status(400).send('Email already exists!');
+  if (emailExists) return res.status(400).send({ message: 'Email already exists!' });
 
   const salt = 10;
   const passwordHashed = await argon2.hash(req.body.password, salt);

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import API_URL from "../config/config";
+import axios from 'axios';
 
 const validEmailRegex = RegExp(
   /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
@@ -10,6 +12,7 @@ const Register = (props) => {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({name: "", email: "", password: ""});
+  const [errorMsg, setErrorMsg] = useState("");
 
   const onChangeName = (e) => {
     const name = e.target.value;
@@ -53,10 +56,31 @@ const Register = (props) => {
 
     if (name === "" || email === "" || password === "") valid = false;
 
-    // TODO: POST request to the API
-    // TODO: change 'loading' state
+    setLoading(true);
+
     if (valid) {
       console.log("form is valid");
+      axios.post(API_URL + '/api/register', {
+        name: name,
+        email: email,
+        password: password
+      })
+      .then((res) => {
+        setLoading(false);
+        setErrorMsg("");
+      })
+      .catch((error) => {
+        if (error.response) {
+          // server responded with an error
+          setErrorMsg(error.response.data.message);
+        } else if (error.request) {
+          // server did not respond
+          setErrorMsg("Please check your network connectivity");
+        } else {
+          // literally something went wrong
+          setErrorMsg("Something went wrong!");
+        }
+      });
     } else {
       console.log("form is invalid");
     }
@@ -85,6 +109,8 @@ const Register = (props) => {
         </div>
         <input type="submit" value="login"/>
       </form>
+      {errorMsg &&
+        <span><h2>{errorMsg}</h2></span>}
     </div>
   )
 }
