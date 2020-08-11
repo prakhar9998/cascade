@@ -1,6 +1,13 @@
-const errorHandler = (err, req, res, next) => {
-  console.log("An error occured!", err);
-  return res.status(500).send('Server error');
+const errorHandler = (err, _req, res, next) => {
+  const error = { ...err };
+
+  error.message = err.message;
+
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
+    success: false,
+    error: error.message || 'Server error',
+  });
 };
 
 module.exports = errorHandler;

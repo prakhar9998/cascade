@@ -1,14 +1,24 @@
 const jwt = require('jsonwebtoken');
+const ErrorResponse = require('../utils/errorResponse');
 
 exports.protect = (req, res, next) => {
-  const token = req.header('auth-token');
-  if (!token) return res.status(401).send('Access Denied');
+  let token;
+
+  if (req.headers.authorization
+    && req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    return next(new ErrorResponse('Unauthorized to access this route.', 401));
+  }
 
   try {
     const verified = jwt.verify(token, process.env.TOKEN_SECRET);
-    req.user = verified;
+    console.log(verified);
     return next();
   } catch (err) {
-    return res.status(400).send('Invalid token');
+    return next(new ErrorResponse('Unauthorized to access this route.'), 401);
   }
 };

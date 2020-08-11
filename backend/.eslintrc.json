@@ -11,5 +11,8 @@
         "ecmaVersion": 11
     },
     "rules": {
+        "no-underscore-dangle": "off",
+        "no-unused-vars": ["error", { "argsIgnorePattern": "next" }],
+        "prefer-destructuring": ["error", {"object": true, "array": false}]
     }
 }
