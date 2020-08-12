@@ -6,11 +6,15 @@ const jwt = require('jsonwebtoken');
 const ErrorResponse = require('../utils/errorResponse');
 
 const userSchema = new mongoose.Schema({
-  username: {
+  firstname: {
     type: String,
     required: true,
-    min: 6,
-    max: 50,
+    min: 3,
+    max: 128,
+  },
+  lastname: {
+    type: String,
+    max: 128,
   },
   email: {
     type: String,
@@ -24,6 +28,10 @@ const userSchema = new mongoose.Schema({
     max: 512,
   },
 }, { timestamps: true });
+
+userSchema.virtual('fullname').get(function () {
+  return `${this.firstname} ${this.lastname}`;
+});
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
