@@ -1,10 +1,14 @@
 const asyncHandler = require('../middlewares/async');
-const { registerValidation, loginValidation } = require('../validation');
+const {
+  registerValidation,
+  loginValidation,
+} = require('../validation/authValidation');
 const ErrorResponse = require('../utils/errorResponse');
+const sendTokenResponse = require('../utils/tokenResponse');
 const User = require('../models/User');
 
 exports.register = asyncHandler(async (req, res, next) => {
-  const { error } = registerValidation(req.body);
+  const { value, error } = registerValidation(req.body);
   if (error) {
     return next(new ErrorResponse(error.details[0].message, 400));
   }
@@ -15,14 +19,12 @@ exports.register = asyncHandler(async (req, res, next) => {
   }
 
   const user = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
+    firstname: value.firstname,
+    email: value.email,
+    password: value.password,
   });
 
-  const token = user.getAuthToken();
-
-  return res.status(200).json({ success: true, token });
+  return sendTokenResponse(res, user, 200);
 });
 
 exports.login = asyncHandler(async (req, res, next) => {
@@ -32,9 +34,12 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    const user = await User.findByCredentials(req.body.email, req.body.password);
-    const token = user.getAuthToken();
-    return res.status(200).header('Bearer').json({ success: true, token });
+    const user = await User.findByCredentials(
+      req.body.email,
+      req.body.password,
+    );
+
+    return sendTokenResponse(res, user, 200);
   } catch (err) {
     return next(err);
   }
