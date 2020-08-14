@@ -1,8 +1,5 @@
 const asyncHandler = require('../middlewares/async');
-const {
-  registerValidation,
-  loginValidation,
-} = require('../validation/authValidation');
+const { registerValidation, loginValidation } = require('../validation/authValidation');
 const ErrorResponse = require('../utils/errorResponse');
 const sendTokenResponse = require('../utils/tokenResponse');
 const User = require('../models/User');
@@ -34,10 +31,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    const user = await User.findByCredentials(
-      req.body.email,
-      req.body.password,
-    );
+    const user = await User.findByCredentials(req.body.email, req.body.password);
 
     return sendTokenResponse(res, user, 200);
   } catch (err) {

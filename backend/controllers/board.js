@@ -1,5 +1,3 @@
-const mongoose = require('mongoose');
-
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
 const { createBoardValidation } = require('../validation/boardValidation');

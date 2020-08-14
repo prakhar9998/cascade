@@ -51,20 +51,14 @@ userSchema.methods.getAuthToken = function () {
   });
 };
 
-userSchema.statics.findByCredentials = async function (
-  email,
-  password,
-) {
+userSchema.statics.findByCredentials = async function (email, password) {
   const user = await this.findOne({ email });
   if (!user) {
     throw new ErrorResponse('Email or password is invalid.', 400);
   }
 
   // matching passwords
-  const isPasswordCorrect = await argon2.verify(
-    user.password,
-    password,
-  );
+  const isPasswordCorrect = await argon2.verify(user.password, password);
   if (!isPasswordCorrect) {
     throw new ErrorResponse('Email or password is invalid.', 400);
   }
