@@ -35,14 +35,12 @@ describe('Testing user registration', () => {
 
   it('should NOT REGISTER already registered user', async (done) => {
     faker.seed(seed);
-    const res = await request(app)
-      .post('/api/register')
-      .send({
-        firstname: faker.name.firstName(),
-        lastname: faker.name.lastName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(8),
-      });
+    const res = await request(app).post('/api/register').send({
+      firstname: 'John',
+      lastname: '',
+      email: 'john12@gmail.com',
+      password: '1234124a1',
+    });
 
     expect(res.status).toEqual(400);
     expect(res.body.success).toBeFalsy();
@@ -57,6 +55,21 @@ describe('Testing user registration', () => {
         lastname: faker.name.lastName(),
         email: faker.internet.email(),
         password: faker.internet.password(7),
+      });
+
+    expect(res.status).toEqual(400);
+    expect(res.body.success).toBeFalsy();
+    done();
+  });
+
+  it('returns 400 if email is not valid', async (done) => {
+    const res = await request(app)
+      .post('/api/register')
+      .send({
+        firstname: faker.name.firstName(),
+        lastname: faker.name.lastName(),
+        email: 'asdf@kfd',
+        password: faker.internet.password(8),
       });
 
     expect(res.status).toEqual(400);

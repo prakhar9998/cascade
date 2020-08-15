@@ -12,7 +12,11 @@ const seedUsers = async (seed, count) => {
     };
   });
 
-  await User.insertMany(userData);
+  // can't use insertMany as it doesn't run the pre-save
+  // middleware which is required to hash the passwords.
+  userData.map(async (user) => {
+    await User.create(user);
+  });
 };
 
 module.exports = seedUsers;
