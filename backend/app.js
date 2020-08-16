@@ -35,9 +35,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', authRouter);
 app.use('/api/board', boardRouter);
-app.get('/test', async (req, res) => {
-  res.json({ message: 'pass!' });
-});
 
 // middleware for handling errors
 app.use(errorHandler);

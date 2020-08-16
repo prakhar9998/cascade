@@ -1,13 +1,9 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const faker = require('faker');
 const app = require('../app');
 const User = require('../models/User');
-// const seedUsers = require('./seeds/seedUsers');
 
 describe('Testing user login', () => {
-  const seed = 12;
-
   beforeAll(async () => {
     const mongoDB = process.env.TEST_DB_URL;
     mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
