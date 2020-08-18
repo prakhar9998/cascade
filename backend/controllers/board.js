@@ -1,6 +1,6 @@
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
-const { createBoardValidation } = require('../validation/boardValidation');
+const { createBoardValidation, updateBoardValidation } = require('../validation/boardValidation');
 const Board = require('../models/Board');
 
 // create a new board for authenticated user
@@ -55,6 +55,10 @@ exports.listBoards = asyncHandler(async (req, res, next) => {
 
 // update board from a given id
 exports.updateBoard = asyncHandler(async (req, res, next) => {
+  const { value, error } = updateBoardValidation(req.body);
+  if (error) {
+    return next(new ErrorResponse(`Invalid parameters specified: ${error.message}`, 400));
+  }
   const { boardId } = req.params;
   if (!boardId) {
     return next(new ErrorResponse('Resource not specified'), 400);
@@ -67,13 +71,22 @@ exports.updateBoard = asyncHandler(async (req, res, next) => {
 
   // check whether user is owner of the board or not
   if (board.creator.toString() !== req.user.id) {
-    return next(new ErrorResponse('User is not authorized to update this board', 401));
+    return next(new ErrorResponse('Not authorized to update this board', 401));
   }
 
-  board = await Board.findByIdAndUpdate(req.param.id, req.body, { new: true });
+  board = await Board.findByIdAndUpdate(boardId, value, { new: true });
   board.save();
 
-  return res.status(200).json({ success: true, data: { ...board } });
+  return res.status(200).json({
+    success: true,
+    data: {
+      id: board._id,
+      title: board.title,
+      description: board.description,
+      members: board.members,
+      creator: board.creator,
+    },
+  });
 });
 
 // delete board with the given id
@@ -83,17 +96,6 @@ exports.deleteBoard = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Resource not specified', 400));
   }
 
-  let board = await Board.findById(boardId);
-  if (!board) {
-    return next(new ErrorResponse('Board does not exist', 400));
-  }
-
-  // check whether user is owner of the board
-  if (board.creator.toString() !== req.user.id) {
-    return next(new ErrorResponse('User is not authorized to delete this board', 401));
-  }
-
-  const resData = await board.remove();
-
-  return res.status(200).json({ success: true, data: { ...resData } });
+  const board = await Board.deleteOne({ _id: boardId });
+  return res.status(200).json({ success: true, data: { ...board } });
 });
