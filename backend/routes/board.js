@@ -12,9 +12,9 @@ const { protect } = require('../middlewares/auth');
 const router = express.Router();
 
 router.get('/all', protect, listBoards);
-router.get('/:boardId', protect, getBoard);
 router.post('/create', protect, createBoard);
-router.post('/update/:boardId', protect, updateBoard);
-router.post('/delete/:boardId', protect, deleteBoard);
+router.get('/:boardId', protect, getBoard);
+router.put('/:boardId', protect, updateBoard);
+router.delete('/:boardId', protect, deleteBoard);
 
 module.exports = router;

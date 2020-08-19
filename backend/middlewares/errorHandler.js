@@ -1,5 +1,5 @@
-const ErrorResponse = require('../utils/errorResponse');
 const mongoose = require('mongoose');
+const ErrorResponse = require('../utils/errorResponse');
 
 const errorHandler = (err, _req, res, next) => {
   let error = { ...err };
@@ -15,8 +15,13 @@ const errorHandler = (err, _req, res, next) => {
     error = new ErrorResponse('Resource not found', 404);
   }
 
+  // mongoose throws a validation error if one of the required fields is invalid ObjectID
+  if (err.name === 'ValidationError') {
+    error = new ErrorResponse(err._message, 400);
+  }
+
   // error shouldn't include error.message in production
-  const statusCode = err.statusCode || 500;
+  const statusCode = error.statusCode || 500;
   res.status(statusCode).json({
     success: false,
     error: error.message || 'Server error',
