@@ -8,7 +8,7 @@ exports.createBoard = asyncHandler(async (req, res, next) => {
   // protected route, creates a board for a user.
   const { value, error } = createBoardValidation(req.body);
   if (error) {
-    return next(new ErrorResponse(error.message), 400);
+    return next(new ErrorResponse(error.message, 400));
   }
 
   const board = await Board.create({
@@ -40,7 +40,7 @@ exports.getBoard = asyncHandler(async (req, res, next) => {
 
     return res.status(200).json({ success: true, data: { ...responseData } });
   } catch (err) {
-    return next(new ErrorResponse('Resource not found'), 404);
+    return next(new ErrorResponse('Resource not found', 400));
   }
 });
 
@@ -48,7 +48,7 @@ exports.getBoard = asyncHandler(async (req, res, next) => {
 exports.listBoards = asyncHandler(async (req, res, next) => {
   const boards = await Board.find({ creator: req.user._id });
   if (!boards) {
-    return next(new ErrorResponse('No boards found'), 404);
+    return next(new ErrorResponse('No boards found', 400));
   }
   return res.status(200).json({ success: true, data: boards });
 });
@@ -61,7 +61,7 @@ exports.updateBoard = asyncHandler(async (req, res, next) => {
   }
   const { boardId } = req.params;
   if (!boardId) {
-    return next(new ErrorResponse('Resource not specified'), 400);
+    return next(new ErrorResponse('Resource not specified', 400));
   }
 
   let board = await Board.findById(boardId);

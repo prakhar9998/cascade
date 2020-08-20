@@ -8,7 +8,7 @@ exports.createList = asyncHandler(async (req, res, next) => {
   // it does not validate for objectID since mongoose will anyway throw
   // an error if it's not valid.
   if (error) {
-    return next(new ErrorResponse(error.message), 400);
+    return next(new ErrorResponse(error.message, 400));
   }
 
   const list = await List.create(value);
@@ -32,7 +32,7 @@ exports.getLists = asyncHandler(async (req, res, next) => {
   const lists = await List.find({});
 
   if (!lists) {
-    return next(new ErrorResponse('No lists found'), 404);
+    return next(new ErrorResponse('No lists found', 400));
   }
 
   return res.status(200).json({ success: true, data: lists });
@@ -41,12 +41,12 @@ exports.getLists = asyncHandler(async (req, res, next) => {
 exports.updateList = asyncHandler(async (req, res, next) => {
   const { value, error } = updateListValidation(req.body);
   if (error) {
-    return next(new ErrorResponse(error.message), 400);
+    return next(new ErrorResponse(error.message, 400));
   }
 
   const { id } = req.params;
   if (!id) {
-    return next(new ErrorResponse('Resource not specified'), 400);
+    return next(new ErrorResponse('Resource not specified', 400));
   }
 
   let list = await List.findById(id);

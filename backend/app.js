@@ -9,6 +9,7 @@ const cors = require('cors');
 const authRouter = require('./routes/auth');
 const boardRouter = require('./routes/board');
 const listRouter = require('./routes/list');
+const cardRouter = require('./routes/card');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -36,6 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', authRouter);
 app.use('/api/board', boardRouter);
 app.use('/api/list', listRouter);
+app.use('/api/card', cardRouter);
 
 // middleware for handling errors
 app.use(errorHandler);
