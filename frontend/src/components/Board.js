@@ -50,15 +50,17 @@ const data = [
 
 const Board = (props) => {
   const onDragEnd = () => {
-    alert("drag ended!");
+    console.log("drag ended!");
   };
 
   return (
-    <div style={{ display: "flex", margin: "20px" }}>
-      {data.map((list) => (
-        <List key={list.id} data={list} />
-      ))}
-    </div>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div style={{ display: "flex", margin: "20px" }}>
+        {data.map((list) => (
+          <List key={list.id} data={list} />
+        ))}
+      </div>
+    </DragDropContext>
   );
 };
 
