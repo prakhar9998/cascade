@@ -9,14 +9,14 @@ const data = [
     title: "list 1",
     cards: [
       {
-        id: "1",
-        title: "card 1",
-        description: "card 1",
+        id: "11",
+        title: "card 11",
+        description: "card 12 desc",
       },
       {
-        id: "2",
-        title: "card 2",
-        description: "card 2 description",
+        id: "12",
+        title: "card 12",
+        description: "card 22 description",
       },
     ],
   },
@@ -25,23 +25,23 @@ const data = [
     title: "list 2",
     cards: [
       {
-        id: "12",
-        title: "card 12",
+        id: "22",
+        title: "card 22",
         description: "card 12 desc",
       },
       {
-        id: "22",
-        title: "card 22",
+        id: "23",
+        title: "card 23",
         description: "card 22 description",
       },
       {
-        id: "32",
-        title: "card 32",
+        id: "24",
+        title: "card 24",
         description: "card 32 description",
       },
       {
-        id: "42",
-        title: "card 42",
+        id: "25",
+        title: "card 25",
         description: "card 42 description",
       },
     ],
@@ -55,11 +55,33 @@ const Board = (props) => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div style={{ display: "flex", margin: "20px" }}>
-        {data.map((list) => (
-          <List key={list.id} data={list} />
-        ))}
-      </div>
+      <Droppable
+        droppableId="droppable-board"
+        direction="horizontal"
+        type="list"
+      >
+        {(provided) => (
+          <div
+            ref={provided.innerRef}
+            style={{ display: "flex", margin: "20px", border: "2px solid red" }}
+          >
+            {data.map((list, index) => (
+              <Draggable key={index} draggableId={list.id} index={index}>
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                  >
+                    <List data={list} />
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
     </DragDropContext>
   );
 };
