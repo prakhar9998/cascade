@@ -5,7 +5,7 @@ const listSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  boardID: {
+  boardId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'board',

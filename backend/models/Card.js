@@ -8,12 +8,12 @@ const cardSchema = new mongoose.Schema({
   description: {
     type: String,
   },
-  listID: {
+  listId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'list',
   },
-  boardID: {
+  boardId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'board',

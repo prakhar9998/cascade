@@ -8,11 +8,27 @@ exports.createCard = asyncHandler(async (req, res, next) => {
   if (error) {
     return next(new ErrorResponse(error.message), 400);
   }
-
+  console.log(value);
   // TODO: Verify that the given boardId and listId exists.
-  const card = await Card.create({ value });
+  const card = await Card.create({
+    title: value.title,
+    description: value.description,
+    listId: value.listId,
+    boardId: value.boardId,
+    creator: req.user,
+  });
 
-  return res.status(201).json({ success: true, data: { ...card } });
+  const responseData = {
+    title: card.title,
+    description: card.description,
+    listId: card.listId,
+    boardId: card.boardId,
+    creator: card.creator,
+    assigned: card.assigned,
+    labels: card.labels,
+  };
+
+  return res.status(201).json({ success: true, data: { ...responseData } });
 });
 
 exports.getCards = asyncHandler(async (req, res, next) => {
@@ -38,8 +54,8 @@ exports.detailCard = asyncHandler(async (req, res, next) => {
     id: card._id,
     title: card.title,
     description: card.description,
-    listID: card.listID,
-    boardID: card.boardID,
+    listId: card.listId,
+    boardId: card.boardId,
     assigned: card.assigned,
     creator: card.creator,
     labels: card.labels,
@@ -71,8 +87,8 @@ exports.updateCard = asyncHandler(async (req, res, next) => {
     id: card._id,
     title: card.title,
     description: card.description,
-    listID: card.listID,
-    boardID: card.boardID,
+    listId: card.listId,
+    boardId: card.boardId,
     assigned: card.assigned,
     creator: card.creator,
     labels: card.labels,

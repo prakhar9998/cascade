@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
 const { createBoardValidation, updateBoardValidation } = require('../validation/boardValidation');
@@ -15,8 +16,8 @@ exports.createBoard = asyncHandler(async (req, res, next) => {
     title: value.title,
     description: value.description,
     creator: req.user,
+    members: [req.user],
   });
-  board.members.push(req.user);
 
   return res.status(201).json({ success: true, data: { id: board._id } });
 });
@@ -28,25 +29,52 @@ exports.getBoard = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Resource not specified', 400));
   }
 
-  try {
-    const board = await Board.findOne({ _id: boardId });
-    const responseData = {
-      id: board._id,
-      title: board.title,
-      description: board.description,
-      members: board.members,
-      creator: board.creator,
-    };
+  // aggregation query for embedding cards inside every list in the lists array.
+  const boardAgg = await Board.aggregate([
+    {
+      $match: { _id: mongoose.Types.ObjectId(boardId) },
+    },
+    {
+      $lookup: {
+        from: 'lists',
+        let: { boardId: '$_id' },
+        pipeline: [
+          { $match: { $expr: { $eq: ['$boardId', '$$boardId'] } } },
+          {
+            $lookup: {
+              from: 'cards',
+              let: { listId: '$_id' },
+              pipeline: [{ $match: { $expr: { $eq: ['$listId', '$$listId'] } } }],
+              as: 'cards',
+            },
+          },
+        ],
+        as: 'lists',
+      },
+    },
+  ]);
 
-    return res.status(200).json({ success: true, data: { ...responseData } });
-  } catch (err) {
-    return next(new ErrorResponse('Resource not found', 400));
+  // should return only 1 board since the _id match is used.
+  if (boardAgg.length !== 1) {
+    return next(new ErrorResponse('Resource not found', 404));
   }
+
+  const responseData = {
+    id: boardAgg[0]._id,
+    title: boardAgg[0].title,
+    description: boardAgg[0].description,
+    members: boardAgg[0].members,
+    creator: boardAgg[0].creator,
+    lists: boardAgg[0].lists,
+    cards: boardAgg[0].cards,
+  };
+
+  return res.status(200).json({ success: true, data: { ...responseData } });
 });
 
 // list all the boards user has created
 exports.listBoards = asyncHandler(async (req, res, next) => {
-  const boards = await Board.find({ creator: req.user._id });
+  const boards = await Board.find({ members: req.user._id });
   if (!boards) {
     return next(new ErrorResponse('No boards found', 400));
   }
