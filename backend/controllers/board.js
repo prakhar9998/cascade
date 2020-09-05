@@ -44,10 +44,14 @@ exports.getBoard = asyncHandler(async (req, res, next) => {
             $lookup: {
               from: 'cards',
               let: { listId: '$_id' },
-              pipeline: [{ $match: { $expr: { $eq: ['$listId', '$$listId'] } } }],
+              pipeline: [
+                { $match: { $expr: { $eq: ['$listId', '$$listId'] } } },
+                { $addFields: { id: '$_id' } },
+              ],
               as: 'cards',
             },
           },
+          { $addFields: { id: '$_id' } },
         ],
         as: 'lists',
       },

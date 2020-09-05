@@ -1,54 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import List from "./List";
-
-// fake data
-const data = [
-  {
-    id: "1",
-    title: "list 1",
-    cards: [
-      {
-        id: "11",
-        title: "card 11",
-        description: "card 12 desc",
-      },
-      {
-        id: "12",
-        title: "card 12",
-        description: "card 22 description",
-      },
-    ],
-  },
-  {
-    id: "2",
-    title: "list 2",
-    cards: [
-      {
-        id: "22",
-        title: "card 22",
-        description: "card 12 desc",
-      },
-      {
-        id: "23",
-        title: "card 23",
-        description: "card 22 description",
-      },
-      {
-        id: "24",
-        title: "card 24",
-        description: "card 32 description",
-      },
-      {
-        id: "25",
-        title: "card 25",
-        description: "card 42 description",
-      },
-    ],
-  },
-];
+import BoardService from "../services/boardService";
+import { useParams } from "react-router-dom";
 
 const Board = (props) => {
+  const [listData, setListData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
+
+  useEffect(() => {
+    BoardService.getBoard(id)
+      .then((response) => {
+        console.log("response", response.data);
+        setListData(response.data.lists);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log("error", err);
+        setLoading(false);
+      });
+  }, []);
+
   const onDragEnd = () => {
     console.log("drag ended!");
   };
@@ -65,7 +38,7 @@ const Board = (props) => {
             ref={provided.innerRef}
             style={{ display: "flex", margin: "20px", border: "2px solid red" }}
           >
-            {data.map((list, index) => (
+            {listData.map((list, index) => (
               <Draggable key={index} draggableId={list.id} index={index}>
                 {(provided) => (
                   <div
