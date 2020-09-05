@@ -38,3 +38,26 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(err);
   }
 });
+
+exports.logout = asyncHandler(async (req, res, next) => {
+  res.cookie('token', 'none', {
+    expires: new Date(0),
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {},
+  });
+});
+
+exports.userDetails = asyncHandler(async (req, res, next) => {
+  res.status(200).json({
+    success: true,
+    data: {
+      firstname: req.user.firstname,
+      lastname: req.user.lastname,
+      email: req.user.email,
+    },
+  });
+});

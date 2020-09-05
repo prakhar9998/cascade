@@ -1,6 +1,3 @@
-const hostname = "localhost";
-const port = "8000";
-
-const API_URL = `http://${hostname}:${port}`;
+const API_URL = process.env.REACT_APP_API_URL;
 
 export default API_URL;

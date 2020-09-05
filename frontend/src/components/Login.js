@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import AuthService from "../services/authService";
 
 import {
   Container,
@@ -60,21 +60,15 @@ const Login = (props) => {
 
     if (valid) {
       setLoading(true);
-      axios
-        .post(API_URL + "/api/login", {
-          email: email,
-          password: password,
-        })
-        .then((res) => {
-          // TODO: save token
+      AuthService.login(email, password)
+        .then(() => {
           setLoading(false);
-          console.log("response", res);
-          setMessage("Successfully logged in!");
+          setMessage("");
         })
         .catch((err) => {
-          if (err.response) {
+          if (err.response.data.error) {
             // server responded with error
-            setMessage(err.response.data.message);
+            setMessage(err.response.data.error);
           } else if (err.request) {
             // server did not respond
             setMessage("Please check your network connectivity.");

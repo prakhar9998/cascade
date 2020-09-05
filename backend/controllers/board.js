@@ -66,7 +66,6 @@ exports.getBoard = asyncHandler(async (req, res, next) => {
     members: boardAgg[0].members,
     creator: boardAgg[0].creator,
     lists: boardAgg[0].lists,
-    cards: boardAgg[0].cards,
   };
 
   return res.status(200).json({ success: true, data: { ...responseData } });

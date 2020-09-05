@@ -1,5 +1,5 @@
 const sendTokenResponse = (res, user, statusCode) => {
-  const expiration = process.env.JWT_COOKIE_EXPIRE || 100;
+  const expiration = process.env.JWT_COOKIE_EXPIRE || 8 * 3600000;
   const token = user.getAuthToken();
   const options = {
     expires: new Date(Date.now() + expiration),
