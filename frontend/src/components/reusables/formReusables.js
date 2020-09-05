@@ -51,8 +51,7 @@ const Input = styled.input`
   &:focus {
     outline: none;
   }
-  &:focus ~ label,
-  &:valid ~ label {
+  &:focus ~ label {
     top: -14px;
     font-size: 12px;
   }

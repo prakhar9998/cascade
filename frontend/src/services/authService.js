@@ -19,12 +19,18 @@ const login = (email, password) => {
 };
 
 const register = (firstname, lastname, email, password) => {
-  return axios.post(API_URL + "/api/register", {
-    firstname: firstname,
-    lastname: lastname,
-    email: email,
-    password: password,
-  });
+  return axios
+    .post(API_URL + "/api/register", {
+      firstname: firstname,
+      lastname: lastname,
+      email: email,
+      password: password,
+    })
+    .then((res) => {
+      // successfully registered.
+      console.log("res", res);
+      return res.data;
+    });
 };
 
 const isAuthenticated = () => {

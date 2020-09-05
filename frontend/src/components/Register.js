@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import AuthService from "../services/authService";
 
 import {
   Container,
@@ -22,19 +22,28 @@ const validEmailRegex = RegExp(
 const Register = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({ name: "", email: "", password: "" });
   const [message, setMessage] = useState("");
 
-  const onChangeName = (e) => {
+  const onChangeFirstname = (e) => {
     const name = e.target.value;
     setErrors((prevState) => ({
       ...prevState,
-      name: name.length < 6 ? "Username must be atleast 8 character long!" : "",
+      firstname:
+        firstname.length < 3
+          ? "Firstname must be atleast 3 character long!"
+          : "",
     }));
 
-    setName(name);
+    setFirstname(name);
+  };
+
+  const onChangeLastname = (e) => {
+    const name = e.target.value;
+    setLastname(name);
   };
 
   const onChangeEmail = (e) => {
@@ -70,33 +79,27 @@ const Register = (props) => {
       if (value.length > 0) valid = false;
     });
 
-    if (name === "" || email === "" || password === "") valid = false;
+    if (firstname === "" || email === "" || password === "") valid = false;
 
     if (valid) {
       setLoading(true);
       console.log("form is valid");
       setMessage("Registering account...");
 
-      axios
-        .post(API_URL + "/api/register", {
-          name: name,
-          email: email,
-          password: password,
-        })
-        .then((res) => {
+      AuthService.register(firstname, lastname, email, password)
+        .then(() => {
           setLoading(false);
-          console.log("response", res);
-          setMessage("Account registered successfully.");
+          setMessage("");
         })
         .catch((err) => {
-          if (err.response) {
-            // server responded with an error
-            setMessage(err.response.data.message);
+          if (err.response.data.error) {
+            // server responded with error
+            setMessage(err.response.data.error);
           } else if (err.request) {
             // server did not respond
             setMessage("Please check your network connectivity.");
           } else {
-            // literally something went wrong
+            // something went wrong
             setMessage("Something went wrong!");
           }
           setLoading(false);
@@ -113,13 +116,22 @@ const Register = (props) => {
         <InputContainer>
           <Input
             type="text"
-            name="name"
-            value={name}
-            onChange={onChangeName}
+            name="firstname"
+            value={firstname}
+            onChange={onChangeFirstname}
             required
           />
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="firstname">Firstname</Label>
           {errors.name && <ErrorContainer>{errors.name}</ErrorContainer>}
+        </InputContainer>
+        <InputContainer>
+          <Input
+            type="text"
+            name="lastname"
+            value={lastname}
+            onChange={onChangeLastname}
+          />
+          <Label htmlFor="firstname">Lastname</Label>
         </InputContainer>
         <InputContainer>
           <EmailInput
