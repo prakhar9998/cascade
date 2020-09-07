@@ -11,7 +11,7 @@ const Card = (props) => {
             {...provided.draggableProps}
             {...provided.dragHandleProps}
           >
-            <h1>{props.title}</h1>
+            <h2>{props.title}</h2>
             <h3>{props.description}</h3>
           </div>
         )}
