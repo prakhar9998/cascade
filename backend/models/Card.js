@@ -34,6 +34,10 @@ const cardSchema = new mongoose.Schema({
       type: String,
     },
   ],
+  order: {
+    type: Number,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model('Card', cardSchema);

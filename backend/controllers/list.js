@@ -11,7 +11,23 @@ exports.createList = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(error.message, 400));
   }
 
-  const list = await List.create(value);
+  // get the list in the board with highest order
+  const highestOrderedList = await List.find({ boardId: value.boardId }).sort('-order').limit(1);
+  let newOrder;
+
+  // checking if there are no lists in the board, if it is the case
+  // then setting current list order as 1
+  if (!highestOrderedList[0]) newOrder = 1;
+  else newOrder = highestOrderedList[0].order + 1;
+
+  // when there is no list in the board
+  if (!newOrder) newOrder = 1;
+
+  const list = await List.create({
+    title: value.title,
+    boardId: value.boardId,
+    order: newOrder, // push the list at the end of all lists
+  });
 
   return res.status(201).json({ success: true, data: { id: list._id } });
 });

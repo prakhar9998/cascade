@@ -10,6 +10,10 @@ const listSchema = new mongoose.Schema({
     required: true,
     ref: 'board',
   },
+  order: {
+    type: Number,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model('List', listSchema);

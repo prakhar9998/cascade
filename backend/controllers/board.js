@@ -47,11 +47,13 @@ exports.getBoard = asyncHandler(async (req, res, next) => {
               pipeline: [
                 { $match: { $expr: { $eq: ['$listId', '$$listId'] } } },
                 { $addFields: { id: '$_id' } },
+                { $sort: { order: 1 } },
               ],
               as: 'cards',
             },
           },
           { $addFields: { id: '$_id' } },
+          { $sort: { order: 1 } },
         ],
         as: 'lists',
       },
