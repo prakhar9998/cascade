@@ -1,7 +1,9 @@
 const asyncHandler = require('../middlewares/async');
 const { createCardValidation, updateCardValidation } = require('../validation/cardValidation');
+const { updatePositionValidation } = require('../validation/updatePositionValidation');
 const ErrorResponse = require('../utils/errorResponse');
 const Card = require('../models/Card');
+const cardService = require('../services/cardService');
 
 exports.createCard = asyncHandler(async (req, res, next) => {
   const { value, error } = createCardValidation(req.body);
@@ -9,40 +11,11 @@ exports.createCard = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(error.message), 400);
   }
 
-  const sortedCards = await Card.find({ listId: value.listId }).sort('order');
+  const cardDTO = { ...value, user: req.user };
 
-  let cardOrder;
+  const { card } = await cardService.createCard(cardDTO);
 
-  if (sortedCards.length === 0) {
-    // this card is the first card in the list
-    cardOrder = 0;
-  } else {
-    // insert at the bottom of the list of cards
-    cardOrder = sortedCards[sortedCards.length - 1].order + 2048;
-  }
-
-  // TODO: Verify that the given boardId and listId exists.
-  const card = await Card.create({
-    title: value.title,
-    description: value.description,
-    listId: value.listId,
-    boardId: value.boardId,
-    creator: req.user,
-    order: cardOrder,
-  });
-
-  const responseData = {
-    title: card.title,
-    description: card.description,
-    listId: card.listId,
-    boardId: card.boardId,
-    creator: card.creator,
-    assigned: card.assigned,
-    labels: card.labels,
-    order: cardOrder,
-  };
-
-  return res.status(201).json({ success: true, data: { ...responseData } });
+  return res.status(201).json({ success: true, data: card });
 });
 
 exports.getCards = asyncHandler(async (req, res, next) => {
@@ -61,21 +34,9 @@ exports.detailCard = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Resource not specified', 400));
   }
 
-  const card = await Card.findById(id);
+  const { card } = await cardService.getCardData(id);
 
-  // TODO: Make a helper function for sending response data
-  const responseData = {
-    id: card._id,
-    title: card.title,
-    description: card.description,
-    listId: card.listId,
-    boardId: card.boardId,
-    assigned: card.assigned,
-    creator: card.creator,
-    labels: card.labels,
-  };
-
-  return res.status(200).json({ success: true, data: { ...responseData } });
+  return res.status(200).json({ success: true, data: card });
 });
 
 exports.updateCard = asyncHandler(async (req, res, next) => {
@@ -89,26 +50,11 @@ exports.updateCard = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Resource not specified', 400));
   }
 
-  let card = await Card.findById(id);
-  if (!card) {
-    return next(new ErrorResponse('Resource not found', 404));
-  }
+  const cardDTO = { id, data: value };
 
-  card = await Card.findByIdAndUpdate(id, value, { new: true });
-  card.save();
+  const card = await cardService.updateCardData(cardDTO);
 
-  const responseData = {
-    id: card._id,
-    title: card.title,
-    description: card.description,
-    listId: card.listId,
-    boardId: card.boardId,
-    assigned: card.assigned,
-    creator: card.creator,
-    labels: card.labels,
-  };
-
-  return res.status(200).json({ success: true, data: { ...responseData } });
+  return res.status(200).json({ success: true, data: card });
 });
 
 exports.deleteCard = asyncHandler(async (req, res, next) => {
@@ -123,46 +69,17 @@ exports.deleteCard = asyncHandler(async (req, res, next) => {
 });
 
 exports.changeCardPositionInList = asyncHandler(async (req, res, next) => {
-  const { initialPosition, finalPosition, listId, boardId } = req.body;
-
-  // TODO: Add validation for checking initialPosition and finalPosition as numbers
-  // validation
-  // if (!initialPosition || !finalPosition || !listId || !boardId) {
-  //   return next(new ErrorResponse('Validation failed', 400));
-  // }
-
-  if (initialPosition === finalPosition) {
-    // do nothing
-
-    // if (cards[0].order - 2048 <= -32000) {
-    //   cards[initialPosition].order = (SOME_LOWER_BOUND + cards[0].order)/2;
-    // }
-
-    return res.status(200).json({ success: true, data: { message: 'Updated' } });
+  const { value, error } = updatePositionValidation(req.body);
+  if (error) {
+    return next(new ErrorResponse(error.message), 400);
   }
 
-  const cards = await Card.find({ listId, boardId }).sort('order');
-
-  // TODO: validate that the positions are inside the range of card array length
-
-  if (finalPosition <= 0) {
-    // pushing at the top.
-    cards[initialPosition].order = cards[0].order - 2048;
-  } else if (finalPosition >= cards.length - 1) {
-    // pushing at the bottom
-
-    // if (cards[cards.length - 1].order + 2048 >= 32000) {
-    //   // start taking average from the upper bound instead of adding the buffer
-    //   cards[initialPosition].order = (SOME_UPPER_BOUND + cards[cards.length - 1].order) / 2;
-    // }
-    cards[initialPosition].order = cards[cards.length - 1].order + 2048;
-  } else {
-    // pushing somewhere in the middle
-    // TODO: reassign the ordering with equal spacing in case the average is smaller than a certain threshold
-    cards[initialPosition].order =
-      (cards[finalPosition - 1].order + cards[finalPosition].order) / 2;
-  }
-  cards[initialPosition].save();
+  await cardService.changePositionInList(
+    value.initialPosition,
+    value.finalPosition,
+    value.listId,
+    value.boardId,
+  );
 
   return res.status(200).json({ success: true, data: { message: 'Updated' } });
 });
