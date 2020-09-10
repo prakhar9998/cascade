@@ -7,6 +7,7 @@ const {
   updateCard,
   deleteCard,
   changeCardPositionInList,
+  moveCardToList,
 } = require('../controllers/cards');
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.get('/:id', protect, detailCard);
 router.put('/:id', protect, updateCard);
 router.delete('/:id', protect, deleteCard);
 router.post('/changePosition', protect, changeCardPositionInList);
+router.post('/moveCard', protect, moveCardToList);
 
 module.exports = router;

@@ -40,15 +40,42 @@ const Board = (props) => {
   };
 
   const reorderInList = (source, destination, droppableId) => {
-    console.log(listData);
-    const newList = listData.map((ele) => {
-      console.log("id", ele.id, "droppa", droppableId);
-      if (ele.id === droppableId) {
-        reorderArray(ele.cards, source, destination);
-      }
-      return ele;
+    setListData((prevState) => {
+      const newLists = [...prevState];
+      newLists.map((ele) => {
+        if (ele.id === droppableId) {
+          reorderArray(ele.cards, source, destination);
+        }
+        return ele;
+      });
+      return newLists;
     });
-    console.log(newList);
+  };
+
+  const moveToList = (source, destination, sourceId, destinationId) => {
+    setListData((prevState) => {
+      const newLists = [...prevState];
+      let sourceCard;
+      newLists.map((ele) => {
+        if (ele.id === sourceId) {
+          console.log("ele", ele);
+          sourceCard = ele.cards[source];
+          ele.cards.splice(source, 1);
+        }
+        return ele;
+      });
+      console.log("source card", sourceCard);
+      newLists.map((ele) => {
+        if (ele.id === destinationId) {
+          ele.cards.splice(destination, 0, sourceCard);
+        }
+        return ele;
+      });
+
+      console.log("new state", newLists);
+
+      return newLists;
+    });
   };
 
   const onDragEnd = (result) => {
@@ -56,30 +83,68 @@ const Board = (props) => {
     // making API call for changing position of card
     const { source, destination } = result;
     console.log("result", result);
-    const payload = {
-      initialPosition: source.index,
-      finalPosition: destination.index,
-      listId: destination.droppableId,
-      boardId: id,
-    };
 
-    axios
-      .post(API_URL + "/api/card/changePosition", payload, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        console.log("res", response.data.data.board.lists);
-        if (response.data.success) {
-          setListData(response.data.data.board.lists);
-        }
-      })
-      .catch((err) => {
-        // TODO: set the error message state as active
-        console.log("an error occured", err);
-      });
+    const isInSameList = source.droppableId === destination.droppableId;
+    console.log("dstate", listData);
 
-    // update UI optimistically
-    reorderInList(source.index, destination.index, destination.droppableId);
+    if (isInSameList) {
+      const payload = {
+        source: source.index,
+        destination: destination.index,
+        listId: destination.droppableId,
+        boardId: id,
+      };
+
+      axios
+        .post(API_URL + "/api/card/changePosition", payload, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log("res", response.data.data.board.lists);
+          if (response.data.success) {
+            setListData(response.data.data.board.lists);
+          }
+        })
+        .catch((err) => {
+          // TODO: set the error message state as active
+          console.log("an error occured", err);
+        });
+
+      // update UI optimistically
+      reorderInList(source.index, destination.index, destination.droppableId);
+    } else {
+      const payload = {
+        source: source.index,
+        destination: destination.index,
+        sourceListId: source.droppableId,
+        destinationListId: destination.droppableId,
+        boardId: id,
+      };
+
+      console.log("payload", payload);
+
+      axios
+        .post(API_URL + "/api/card/moveCard", payload, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log("move card to list response", response.data);
+          if (response.data.success) {
+            setListData(response.data.data.board.lists);
+          }
+        })
+        .catch((err) => {
+          console.log("an error occured", err);
+        });
+
+      // update UI optimistically
+      moveToList(
+        source.index,
+        destination.index,
+        source.droppableId,
+        destination.droppableId
+      );
+    }
   };
 
   const handleTitleChange = (e) => {

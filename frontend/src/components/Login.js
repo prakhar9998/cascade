@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AuthService from "../services/authService";
-
+import { useHistory } from "react-router-dom";
 import {
   Container,
   InputContainer,
@@ -12,8 +12,6 @@ import {
   SubmitButton,
 } from "./reusables/formReusables";
 
-import API_URL from "../config/config";
-
 const validEmailRegex = RegExp(
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 );
@@ -24,6 +22,7 @@ const Login = (props) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
+  const history = useHistory();
 
   const onChangeEmail = (e) => {
     const email = e.target.value;
@@ -64,6 +63,7 @@ const Login = (props) => {
         .then(() => {
           setLoading(false);
           setMessage("");
+          history.push("/dashboard");
         })
         .catch((err) => {
           if (err.response && err.response.data.error) {

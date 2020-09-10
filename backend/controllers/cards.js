@@ -1,6 +1,9 @@
 const asyncHandler = require('../middlewares/async');
 const { createCardValidation, updateCardValidation } = require('../validation/cardValidation');
-const { updatePositionValidation } = require('../validation/updatePositionValidation');
+const {
+  updatePositionValidation,
+  moveCardValidation,
+} = require('../validation/dragDropValidation');
 const ErrorResponse = require('../utils/errorResponse');
 const Card = require('../models/Card');
 const cardService = require('../services/cardService');
@@ -75,9 +78,26 @@ exports.changeCardPositionInList = asyncHandler(async (req, res, next) => {
   }
 
   const { board } = await cardService.changePositionInList(
-    value.initialPosition,
-    value.finalPosition,
+    value.source,
+    value.destination,
     value.listId,
+    value.boardId,
+  );
+
+  return res.status(200).json({ success: true, data: board });
+});
+
+exports.moveCardToList = asyncHandler(async (req, res, next) => {
+  const { value, error } = moveCardValidation(req.body);
+  if (error) {
+    return next(new ErrorResponse(error.message), 400);
+  }
+
+  const { board } = await cardService.moveCardToList(
+    value.source,
+    value.destination,
+    value.sourceListId,
+    value.destinationListId,
     value.boardId,
   );
 
