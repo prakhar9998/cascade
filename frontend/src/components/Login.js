@@ -66,7 +66,7 @@ const Login = (props) => {
           setMessage("");
         })
         .catch((err) => {
-          if (err.response.data.error) {
+          if (err.response && err.response.data.error) {
             // server responded with error
             setMessage(err.response.data.error);
           } else if (err.request) {

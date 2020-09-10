@@ -5,6 +5,8 @@ import BoardService from "../services/boardService";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import ListService from "../services/ListService";
+import axios from "axios";
+import API_URL from "../config/config";
 
 const Container = styled.div``;
 const Button = styled.button``;
@@ -31,8 +33,53 @@ const Board = (props) => {
       });
   }, []);
 
-  const onDragEnd = () => {
-    console.log("drag ended!");
+  const reorderArray = (arr, source, destination) => {
+    var ele = arr[source];
+    arr.splice(source, 1);
+    arr.splice(destination, 0, ele);
+  };
+
+  const reorderInList = (source, destination, droppableId) => {
+    console.log(listData);
+    const newList = listData.map((ele) => {
+      console.log("id", ele.id, "droppa", droppableId);
+      if (ele.id === droppableId) {
+        reorderArray(ele.cards, source, destination);
+      }
+      return ele;
+    });
+    console.log(newList);
+  };
+
+  const onDragEnd = (result) => {
+    // TODO: figure out if its a list or a card
+    // making API call for changing position of card
+    const { source, destination } = result;
+    console.log("result", result);
+    const payload = {
+      initialPosition: source.index,
+      finalPosition: destination.index,
+      listId: destination.droppableId,
+      boardId: id,
+    };
+
+    axios
+      .post(API_URL + "/api/card/changePosition", payload, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log("res", response.data.data.board.lists);
+        if (response.data.success) {
+          setListData(response.data.data.board.lists);
+        }
+      })
+      .catch((err) => {
+        // TODO: set the error message state as active
+        console.log("an error occured", err);
+      });
+
+    // update UI optimistically
+    reorderInList(source.index, destination.index, destination.droppableId);
   };
 
   const handleTitleChange = (e) => {
@@ -41,7 +88,9 @@ const Board = (props) => {
   };
 
   const createList = () => {
-    ListService.createList(id, listTitle).then(() => console.log("success"));
+    ListService.createList(id, listTitle).then((res) => {
+      console.log("data", res.data);
+    });
   };
 
   return (

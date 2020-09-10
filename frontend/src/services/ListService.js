@@ -9,7 +9,7 @@ const createList = (boardId, title) => {
       { withCredentials: true }
     )
     .then((res) => {
-      console.log("list created", res);
+      return res.data;
     })
     .catch((err) => {
       console.log("error", err);

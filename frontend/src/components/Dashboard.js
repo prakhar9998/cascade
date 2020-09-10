@@ -19,7 +19,7 @@ const Dashboard = () => {
     axios
       .get(API_URL + "/api/board/all", { withCredentials: true })
       .then((res) => {
-        setBoards(res.data.data);
+        setBoards(res.data.data.boards);
       })
       .catch((err) => {
         console.log("error", err);
@@ -45,6 +45,10 @@ const Dashboard = () => {
   const createBoard = () => {
     BoardService.createBoard(boardData.title, boardData.description).then(
       (res) => {
+        if (res.success) {
+          setBoards((prevState) => [...prevState, res.data]);
+        }
+        console.log("res", res);
         console.log("success");
       }
     );

@@ -74,12 +74,12 @@ exports.changeCardPositionInList = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(error.message), 400);
   }
 
-  await cardService.changePositionInList(
+  const { board } = await cardService.changePositionInList(
     value.initialPosition,
     value.finalPosition,
     value.listId,
     value.boardId,
   );
 
-  return res.status(200).json({ success: true, data: { message: 'Updated' } });
+  return res.status(200).json({ success: true, data: board });
 });

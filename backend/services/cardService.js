@@ -1,5 +1,6 @@
 const Card = require('../models/Card');
 const ErrorResponse = require('../utils/errorResponse');
+const boardService = require('./boardService');
 
 const createCard = async (card) => {
   // new card is always created at the bottom of the list.
@@ -73,7 +74,10 @@ const changePositionInList = async (initialPosition, finalPosition, listId, boar
     sortedCardRecords[initialPosition].order =
       (sortedCardRecords[finalPosition - 1].order + sortedCardRecords[finalPosition].order) / 2;
   }
-  sortedCardRecords[initialPosition].save();
+  await sortedCardRecords[initialPosition].save();
+
+  const updatedBoard = await boardService.getBoardData(boardId);
+  return { board: updatedBoard };
 };
 
 module.exports = { createCard, getCardData, updateCardData, changePositionInList };
