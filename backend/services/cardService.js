@@ -65,7 +65,7 @@ const changePositionInList = async (source, destination, listId, boardId) => {
   if (destination <= 0) {
     // position this card at top
     sortedCardRecords[source].order = sortedCardRecords[0].order - 1024;
-  } else if (destination >= totalCardRecords) {
+  } else if (destination >= totalCardRecords - 1) {
     // positing this card at bottom
     sortedCardRecords[source].order = sortedCardRecords[totalCardRecords - 1].order + 1024;
   } else {
@@ -99,7 +99,7 @@ const moveCardToList = async (source, destination, sourceListId, destinationList
   } else if (destination <= 0) {
     // at top
     newOrder = destinationCardRecords[0].order - 1024;
-  } else if (destination >= totalRecords) {
+  } else if (destination >= totalRecords - 1) {
     // at bottom
     newOrder = destinationCardRecords[totalRecords - 1].order + 1024;
   } else {

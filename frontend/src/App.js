@@ -7,12 +7,16 @@ import Register from "./components/Register";
 import Board from "./components/Board";
 import Dashboard from "./components/Dashboard";
 import PrivateRoute from "./utils/PrivateRoute";
+import Sidebar from "./components/Sidebar";
 
 function App() {
   return (
     <div className="App">
       <Router>
         <Switch>
+          <Router path="/">
+            <Sidebar />
+          </Router>
           <Route path="/login">
             <Login />
           </Route>
