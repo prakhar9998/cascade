@@ -26,4 +26,15 @@ const getBoard = (id) => {
     });
 };
 
+const boardsList = () => {
+  return axios
+    .get(API_URL + "/api/board/all", { withCredentials: true })
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
 export default { createBoard, getBoard };
