@@ -24,7 +24,10 @@ import Link from "@material-ui/core/Link";
 import styled from "styled-components";
 
 const drawerWidth = 240;
-
+const navTextColor = "#d1dede";
+const selectedNavColor = "#ED9B40";
+const navHoverColor = "#221E22";
+const navBackground = "#292C2F";
 const StyledList = styled(List)``;
 
 const Root = styled.div`
@@ -55,11 +58,39 @@ const NestedListItem = styled(ListItem)`
   }
 `;
 
-const NavIcon = styled(ListItemIcon)``;
+const StyledListItem = styled(ListItem)`
+  &.Mui-selected {
+    && {
+      color: ${selectedNavColor};
+    }
+  }
+
+  &:hover {
+    && {
+      background-color: ${navHoverColor};
+    }
+  }
+
+  && {
+    height: 64px;
+  }
+`;
+
+const NavIcon = styled(ListItemIcon)`
+  .MuiSvgIcon-colorPrimary {
+    color: ${selectedNavColor};
+  }
+
+  .MuiSvgIcon-colorSecondary {
+    color: ${navTextColor};
+  }
+`;
 
 const NavDrawer = styled(Drawer)`
   .MuiDrawer-paper {
     width: ${drawerWidth}px;
+    background-color: ${navBackground};
+    color: ${navTextColor};
   }
 `;
 
@@ -109,13 +140,20 @@ function Sidebar(props) {
       <ToolbarSpace />
       <Divider />
       <StyledList>
-        <Link component={RouterLink} to="/dashboard">
-          <ListItem button selected={activeRoute("dashboard")}>
-            <ListItemIcon>
-              <DashboardTwoToneIcon />
-            </ListItemIcon>
+        <Link
+          component={RouterLink}
+          to="/dashboard"
+          color="inherit"
+          underline="none"
+        >
+          <StyledListItem button selected={activeRoute("dashboard")}>
+            <NavIcon>
+              <DashboardTwoToneIcon
+                color={activeRoute("dashboard") ? "primary" : "secondary"}
+              />
+            </NavIcon>
             <ListItemText primary="Dashboard" />
-          </ListItem>
+          </StyledListItem>
         </Link>
         <ListItem button>
           <ListItemIcon>
@@ -159,7 +197,7 @@ function Sidebar(props) {
             <MenuIcon />
           </StyledIconButton>
           <Typography variant="h6" noWrap>
-            Responsive drawer
+            Drawer
           </Typography>
         </Toolbar>
       </StyledAppBar>
