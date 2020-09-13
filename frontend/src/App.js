@@ -8,7 +8,7 @@ import Board from "./components/Board";
 import Dashboard from "./components/Dashboard";
 import PrivateRoute from "./utils/PrivateRoute";
 import Sidebar from "./components/Sidebar";
-import styled from "styled-components";
+import { BoardsList } from "./features/boards/BoardsList";
 
 function Side() {
   return (
@@ -47,6 +47,7 @@ function App() {
             )}
             exact={true}
           />
+          <PrivateRoute path="/boards" component={BoardsList} exact={true} />
         </Switch>
       </Router>
     </div>

@@ -26,15 +26,15 @@ const getBoard = (id) => {
     });
 };
 
-const boardsList = () => {
-  return axios
-    .get(API_URL + "/api/board/all", { withCredentials: true })
-    .then((res) => {
-      console.log(res);
-    })
-    .catch((err) => {
-      console.log(err);
+const boardsList = async () => {
+  try {
+    const res = await axios.get(API_URL + "/api/board/all", {
+      withCredentials: true,
     });
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-export default { createBoard, getBoard };
+export default { createBoard, getBoard, boardsList };
