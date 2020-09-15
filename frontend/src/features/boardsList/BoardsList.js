@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectAllBoards, fetchBoards } from "./boardsSlice";
+import { AddBoard } from "./AddBoard";
+import { selectAllBoards, fetchBoardsList } from "./boardsListSlice";
+import { RemoveBoardButton } from "./RemoveBoardButton";
 
 export const BoardsList = () => {
   const dispatch = useDispatch();
@@ -12,7 +14,7 @@ export const BoardsList = () => {
   // fetching boards
   useEffect(() => {
     if (boardStatus === "idle") {
-      dispatch(fetchBoards());
+      dispatch(fetchBoardsList());
     }
   }, [boardStatus, dispatch]);
 
@@ -26,9 +28,10 @@ export const BoardsList = () => {
     );
   } else if (boardStatus === "succeeded") {
     const renderBoards = boards.map((board) => (
-      <div>
+      <div key={board._id}>
         <h2>Title: {board.title}</h2>
         <h4>Description: {board.description}</h4>
+        <RemoveBoardButton boardId={board._id} />
       </div>
     ));
 
@@ -41,6 +44,7 @@ export const BoardsList = () => {
     <div>
       <h1>All Boards:</h1>
       {renderedContent}
+      <AddBoard />
     </div>
   );
 };

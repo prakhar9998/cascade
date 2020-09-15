@@ -4,19 +4,12 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Board from "./components/Board";
+// import Board from "./components/Board";
 import Dashboard from "./components/Dashboard";
 import PrivateRoute from "./utils/PrivateRoute";
 import Sidebar from "./components/Sidebar";
-import { BoardsList } from "./features/boards/BoardsList";
-
-function Side() {
-  return (
-    <Sidebar>
-      <Dashboard />
-    </Sidebar>
-  );
-}
+import { BoardsList } from "./features/boardsList/BoardsList";
+import { Board } from "./features/board/Board";
 
 function App() {
   return (
