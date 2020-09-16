@@ -1,7 +1,13 @@
 import React, { useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBoard, selectAllLists, selectBoard } from "./boardSlice";
+import {
+  fetchBoard,
+  selectAllLists,
+  selectBoard,
+  changeCardPosition,
+  moveCardToList,
+} from "./boardSlice";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { List } from "./List";
@@ -24,12 +30,39 @@ export const Board = () => {
 
   useEffect(() => {
     if (boardStatus === "idle") {
+      console.log("action", fetchBoard.pending);
       dispatch(fetchBoard(id));
     }
   }, [boardStatus, dispatch]);
 
-  const onDragEnd = () => {
+  const onDragEnd = (result) => {
     console.log("drag ended");
+    const { source, destination } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    const inSameList = source.droppableId === destination.droppableId;
+
+    if (inSameList) {
+      dispatch(
+        changeCardPosition({
+          source: source.index,
+          destination: destination.index,
+          listId: source.droppableId,
+        })
+      );
+    } else {
+      dispatch(
+        moveCardToList({
+          source: source.index,
+          destination: destination.index,
+          sourceListId: source.droppableId,
+          destinationListId: destination.droppableId,
+        })
+      );
+    }
   };
 
   let content;

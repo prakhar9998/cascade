@@ -60,6 +60,46 @@ const boardSlice = createSlice({
     addListToBoard(state, action) {
       const { title } = action.payload;
     },
+    changeCardPosition(state, action) {
+      const { source, destination, listId } = action.payload;
+
+      // finding list
+      const listIndex = state.data.lists.findIndex(
+        (list) => list._id === listId
+      );
+
+      if (listIndex === -1) {
+        return;
+      }
+
+      // reordering cards inplace (immer magic)
+      state.data.lists[listIndex].cards.splice(
+        destination,
+        0,
+        state.data.lists[listIndex].cards.splice(source, 1)[0]
+      );
+    },
+    moveCardToList(state, action) {
+      const {
+        source,
+        destination,
+        sourceListId,
+        destinationListId,
+      } = action.payload;
+
+      const srcListIndex = state.data.lists.findIndex(
+        (list) => list._id === sourceListId
+      );
+      const desListIndex = state.data.lists.findIndex(
+        (list) => list._id === destinationListId
+      );
+
+      state.data.lists[desListIndex].cards.splice(
+        destination,
+        0,
+        state.data.lists[srcListIndex].cards.splice(source, 1)[0]
+      );
+    },
   },
   extraReducers: {
     // Retrieve board
@@ -88,7 +128,11 @@ const boardSlice = createSlice({
   },
 });
 
-export const { addListToBoard } = boardSlice.actions;
+export const {
+  addListToBoard,
+  changeCardPosition,
+  moveCardToList,
+} = boardSlice.actions;
 
 export default boardSlice.reducer;
 
