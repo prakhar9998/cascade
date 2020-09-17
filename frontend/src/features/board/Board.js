@@ -15,6 +15,8 @@ import styled from "styled-components";
 
 import { useParams } from "react-router-dom";
 import { List } from "./List";
+import { BoardToolbar } from "./BoardToolbar";
+import { AddMemberForm } from "./AddMemberForm";
 
 const BoardContainer = styled.div``;
 const Button = styled.button``;
@@ -100,7 +102,6 @@ export const Board = () => {
                 style={{
                   display: "flex",
                   margin: "20px",
-                  border: "2px solid red",
                 }}
               >
                 {lists.map((list, index) => (
@@ -131,5 +132,11 @@ export const Board = () => {
     content = <div>{error}</div>;
   }
 
-  return <div>{content}</div>;
+  return (
+    <div>
+      <BoardToolbar />
+      {content}
+      <AddMemberForm />
+    </div>
+  );
 };

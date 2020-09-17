@@ -140,3 +140,5 @@ export default boardSlice.reducer;
 export const selectBoard = (state) => state.board.data;
 
 export const selectAllLists = (state) => state.board.data.lists;
+
+export const selectAllMembers = (state) => state.board.members;
