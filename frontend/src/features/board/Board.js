@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -22,6 +22,8 @@ const Input = styled.input``;
 const Label = styled.label``;
 
 export const Board = () => {
+  const [prevId, setPrevId] = useState(null);
+
   const board = useSelector(selectBoard);
   const lists = useSelector(selectAllLists);
 
@@ -33,11 +35,17 @@ export const Board = () => {
   const error = useSelector((state) => state.board.error);
 
   useEffect(() => {
-    if (boardStatus === "idle") {
-      console.log("action", fetchBoard.pending);
-      dispatch(fetchBoard(id));
-    }
-  }, [boardStatus, dispatch]);
+    console.log("mounted");
+    console.log("action", fetchBoard.pending);
+    dispatch(fetchBoard(id));
+  }, [dispatch]);
+
+  // the component isn't unmounted if users clicks one board then other
+  // in this case fetchBoard action has to be dispatched again
+  if (id !== prevId) {
+    dispatch(fetchBoard(id));
+    setPrevId(id);
+  }
 
   const onDragEnd = (result) => {
     console.log("drag ended");

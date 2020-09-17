@@ -26,7 +26,7 @@ function App() {
             path="/dashboard"
             component={(props) => (
               <Sidebar {...props}>
-                <Dashboard />
+                <BoardsList />
               </Sidebar>
             )}
             exact={true}
@@ -40,7 +40,6 @@ function App() {
             )}
             exact={true}
           />
-          <PrivateRoute path="/boards" component={BoardsList} exact={true} />
         </Switch>
       </Router>
     </div>

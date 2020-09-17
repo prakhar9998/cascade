@@ -1,18 +1,18 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
 import Hidden from "@material-ui/core/Hidden";
 import IconButton from "@material-ui/core/IconButton";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
+import FolderTwoToneIcon from "@material-ui/icons/FolderTwoTone";
+import SettingsApplicationsTwoToneIcon from "@material-ui/icons/SettingsApplicationsTwoTone";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Collapse from "@material-ui/core/Collapse";
-import MailIcon from "@material-ui/icons/Mail";
-import MenuIcon from "@material-ui/icons/Menu";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import ExpandLess from "@material-ui/icons/ExpandLess";
@@ -22,6 +22,12 @@ import { Link as RouterLink } from "react-router-dom";
 import Link from "@material-ui/core/Link";
 
 import styled from "styled-components";
+
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchBoardsList,
+  selectAllBoards,
+} from "../features/boardsList/boardsListSlice";
 
 const drawerWidth = 240;
 const navTextColor = "#d1dede";
@@ -59,6 +65,24 @@ const NestedListItem = styled(ListItem)`
 `;
 
 const StyledListItem = styled(ListItem)`
+  &.Mui-selected {
+    && {
+      color: ${selectedNavColor};
+    }
+  }
+
+  &:hover {
+    && {
+      background-color: ${navHoverColor};
+    }
+  }
+
+  && {
+    height: 64px;
+  }
+`;
+
+const NestedStyledListItem = styled(NestedListItem)`
   &.Mui-selected {
     && {
       color: ${selectedNavColor};
@@ -124,12 +148,61 @@ const ToolbarSpace = styled.div`
 
 function Sidebar(props) {
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [boardsOpen, setBoardsOpen] = React.useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [boardsOpen, setBoardsOpen] = useState(true);
+
+  const boardsStatus = useSelector((state) => state.boards.status);
+  const error = useSelector((state) => state.boards.error);
+  const boards = useSelector(selectAllBoards);
+
+  const dispatch = useDispatch();
 
   const activeRoute = (routeName) => {
     return props.location.pathname.indexOf(routeName) > -1 ? true : false;
   };
+
+  useEffect(() => {
+    if (boardsStatus === "idle") {
+      dispatch(fetchBoardsList());
+    }
+
+    return () => {
+      console.log("sidebar unmounted");
+    };
+  }, [boardsStatus, dispatch]);
+
+  let renderedContent;
+  let boardNavLinks;
+
+  if (boardsStatus === "loading") {
+    renderedContent = (
+      <div>
+        <h1>Loading...</h1>
+      </div>
+    );
+  } else if (boardsStatus === "succeeded") {
+    renderedContent = props.children;
+    boardNavLinks = (
+      <List component="div" disablePadding>
+        {boards.map((board) => (
+          <Link
+            key={board._id}
+            component={RouterLink}
+            to={`/board/${board._id}`}
+            color="inherit"
+            underline="none"
+          >
+            <NestedStyledListItem button selected={activeRoute(`${board._id}`)}>
+              <ListItemIcon></ListItemIcon>
+              <ListItemText primary={board.title} />
+            </NestedStyledListItem>
+          </Link>
+        ))}
+      </List>
+    );
+  } else if (boardsStatus === "failed") {
+    renderedContent = <div>{error}</div>;
+  }
 
   const handleBoardsOpen = () => {
     setBoardsOpen(!boardsOpen);
@@ -159,27 +232,26 @@ function Sidebar(props) {
             <ListItemText primary="Dashboard" />
           </StyledListItem>
         </Link>
+        <StyledListItem
+          button
+          onClick={handleBoardsOpen}
+          selected={activeRoute("board/")}
+        >
+          <NavIcon>
+            <FolderTwoToneIcon
+              color={activeRoute("board/") ? "primary" : "secondary"}
+            />
+          </NavIcon>
+          <ListItemText primary="Projects" />
+          {boardsOpen ? <ExpandLess /> : <ExpandMore />}
+        </StyledListItem>
+        <Collapse in={boardsOpen} timeout="auto" unmountOnExit>
+          {boardNavLinks}
+        </Collapse>
         <ListItem button>
-          <ListItemIcon>
-            <InboxIcon />
-          </ListItemIcon>
+          <ListItemIcon></ListItemIcon>
           <ListItemText primary="Settings" />
         </ListItem>
-        <ListItem button onClick={handleBoardsOpen}>
-          <ListItemIcon>
-            <InboxIcon />
-          </ListItemIcon>
-          <ListItemText primary="Boards" />
-          {boardsOpen ? <ExpandLess /> : <ExpandMore />}
-        </ListItem>
-        <Collapse in={boardsOpen} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <NestedListItem button>
-              <ListItemIcon></ListItemIcon>
-              <ListItemText primary="Board 1" />
-            </NestedListItem>
-          </List>
-        </Collapse>
       </StyledList>
     </div>
   );
@@ -197,9 +269,7 @@ function Sidebar(props) {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-          >
-            <MenuIcon />
-          </StyledIconButton>
+          ></StyledIconButton>
           <Typography variant="h6" noWrap>
             Drawer
           </Typography>
@@ -228,7 +298,7 @@ function Sidebar(props) {
       </NavBar>
       <ContentContainer>
         <ToolbarSpace />
-        {props.children}
+        {renderedContent}
       </ContentContainer>
     </Root>
   );
