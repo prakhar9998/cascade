@@ -8,11 +8,15 @@ import {
   changeCardPosition,
   moveCardToList,
 } from "./boardSlice";
+
+import Container from "@material-ui/core/Container";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import styled from "styled-components";
+
 import { useParams } from "react-router-dom";
 import { List } from "./List";
 
-const Container = styled.div``;
+const BoardContainer = styled.div``;
 const Button = styled.button``;
 const Input = styled.input``;
 const Label = styled.label``;
@@ -68,11 +72,14 @@ export const Board = () => {
   let content;
 
   if (boardStatus === "loading") {
-    // TODO: Add loading icno here
-    content = <h3>Loading...</h3>;
+    content = (
+      <div style={{ margin: "25% 0 0 0" }}>
+        <CircularProgress style={{ margin: "auto", display: "block" }} />
+      </div>
+    );
   } else if (boardStatus === "succeeded") {
     content = (
-      <Container>
+      <BoardContainer>
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable
             droppableId="droppable-board"
@@ -110,7 +117,7 @@ export const Board = () => {
             )}
           </Droppable>
         </DragDropContext>
-      </Container>
+      </BoardContainer>
     );
   } else if (boardStatus === "failed") {
     content = <div>{error}</div>;

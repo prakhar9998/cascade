@@ -25,9 +25,9 @@ import styled from "styled-components";
 
 const drawerWidth = 240;
 const navTextColor = "#d1dede";
-const selectedNavColor = "#ED9B40";
+const selectedNavColor = "#FFB545";
 const navHoverColor = "#221E22";
-const navBackground = "#292C2F";
+const navBackground = "#2D3438";
 const StyledList = styled(List)``;
 
 const Root = styled.div`
@@ -104,6 +104,10 @@ const NavBar = styled.nav`
 const ContentContainer = styled.main`
   flex-row: 1;
   padding: 24px;
+  margin: 0 auto;
+  width: 100%;
+  height: 100vh;
+  background: #ffffff;
 `;
 
 const ToolbarSpace = styled.div`
