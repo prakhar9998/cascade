@@ -3,6 +3,36 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addBoard } from "./boardsListSlice";
 
+import styled from "styled-components";
+
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
+
+const Container = styled.div`
+  background: white;
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  height: 350px;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+`;
+
+const Input = styled(TextField)`
+  && {
+    margin-bottom: 20px;
+  }
+`;
+
+const Heading = styled.p`
+  font-size: 28px;
+`;
+
+const StyledButton = styled(Button)``;
+
 export const AddBoard = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -32,34 +62,35 @@ export const AddBoard = () => {
   };
 
   return (
-    <div>
-      <h2>Add a new board:</h2>
-      <form>
-        <label htmlFor="boardTitle">Board Title</label>
-        <input
-          type="text"
-          id="boardTitle"
-          name="boardTitle"
-          placeholder="Title"
-          value={title}
-          onChange={onTitleChange}
-          required
-        />
+    <Container>
+      <Heading>Add a new board:</Heading>
+      <Input
+        type="text"
+        id="boardTitle"
+        name="boardTitle"
+        label="Title"
+        value={title}
+        onChange={onTitleChange}
+        required
+      />
 
-        <label htmlFor="boardDescription">Board Description</label>
-        <input
-          type="text"
-          id="boardDescription"
-          name="boardDescription"
-          placeholder="What's this board about?"
-          value={description}
-          onChange={onDescriptionChange}
-        />
+      <Input
+        type="text"
+        id="boardDescription"
+        name="boardDescription"
+        label="Description"
+        placeholder="What's this board about?"
+        value={description}
+        onChange={onDescriptionChange}
+      />
 
-        <button type="button" onClick={handleAddBoardClick} disabled={!isValid}>
-          Save Board
-        </button>
-      </form>
-    </div>
+      <StyledButton
+        color="primary"
+        onClick={handleAddBoardClick}
+        disabled={!isValid}
+      >
+        Save Board
+      </StyledButton>
+    </Container>
   );
 };
