@@ -132,7 +132,7 @@ const ContentContainer = styled.main`
   margin: 0 auto;
   width: 100%;
   height: 100vh;
-  background: #ffffff;
+  background: #f3f3f3;
 `;
 
 const ToolbarSpace = styled.div`
