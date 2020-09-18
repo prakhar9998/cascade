@@ -55,6 +55,7 @@ exports.userDetails = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: {
+      _id: req.user._id,
       firstname: req.user.firstname,
       lastname: req.user.lastname,
       email: req.user.email,

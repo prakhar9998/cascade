@@ -28,6 +28,7 @@ import {
   fetchBoardsList,
   selectAllBoards,
 } from "../features/boardsList/boardsListSlice";
+import { MeComponent } from "../features/profile/MeComponent";
 
 const drawerWidth = 240;
 const navTextColor = "#d1dede";
@@ -217,6 +218,7 @@ function Sidebar(props) {
       <ToolbarSpace />
       <Divider />
       <StyledList>
+        <MeComponent />
         <Link
           component={RouterLink}
           to="/dashboard"

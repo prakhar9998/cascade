@@ -4,7 +4,7 @@ import API_URL from "../../config/config";
 import APIErrorHandler from "../../utils/APIErrorHandler";
 
 const initialState = {
-  data: [],
+  data: {},
   status: "idle",
   error: null,
 };
