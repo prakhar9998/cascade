@@ -23,6 +23,8 @@ import Link from "@material-ui/core/Link";
 
 import styled from "styled-components";
 
+import { socket, connect } from "../socketClient/socketClient";
+
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchBoardsList,
@@ -167,8 +169,11 @@ function Sidebar(props) {
       dispatch(fetchBoardsList());
     }
 
+    connect();
+
     return () => {
       console.log("sidebar unmounted");
+      socket.disconnect();
     };
   }, [boardsStatus, dispatch]);
 

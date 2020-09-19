@@ -7,7 +7,7 @@ socketApi.io = io;
 
 io.on('connection', (socket) => {
   console.log('A user connected');
-  socket.on('test event', () => {
+  socket.on('test', () => {
     io.emit('test event', { response: 'true' });
   });
 

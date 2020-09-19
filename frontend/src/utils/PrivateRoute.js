@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import AuthService from "../services/authService";
 import { Route, Redirect } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { addProfile, selectProfile } from "../features/profile/profileSlice";
+import { useDispatch } from "react-redux";
+import { addProfile } from "../features/profile/profileSlice";
 
 import axios from "axios";
 import API_URL from "../config/config";
