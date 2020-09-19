@@ -3,10 +3,9 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchBoard,
-  selectAllLists,
-  selectBoard,
   changeCardPosition,
   moveCardToList,
+  selectBoard,
 } from "./boardSlice";
 
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -15,18 +14,15 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { List } from "./List";
 import { BoardToolbar } from "./BoardToolbar";
-import { AddMemberForm } from "./AddMemberForm";
+import { socket } from "../../socketClient/socketClient";
 
 const BoardContainer = styled.div``;
-const Button = styled.button``;
-const Input = styled.input``;
-const Label = styled.label``;
+const Container = styled.div``;
 
 export const Board = () => {
   const [prevId, setPrevId] = useState(null);
 
   const board = useSelector(selectBoard);
-  const lists = useSelector(selectAllLists);
 
   const { id } = useParams();
 
@@ -66,6 +62,18 @@ export const Board = () => {
           listId: source.droppableId,
         })
       );
+      socket.emit(
+        "CHANGE_CARD_POSITION",
+        {
+          source: source.index,
+          destination: destination.index,
+          listId: source.droppableId,
+          boardId: id,
+        },
+        (res) => {
+          console.log("socket response", res);
+        }
+      );
     } else {
       dispatch(
         moveCardToList({
@@ -88,54 +96,51 @@ export const Board = () => {
     );
   } else if (boardStatus === "succeeded") {
     content = (
-      <BoardContainer>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable
-            droppableId="droppable-board"
-            direction="horizontal"
-            type="list"
-          >
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                style={{
-                  display: "flex",
-                  margin: "20px",
-                }}
-              >
-                {lists.map((list, index) => (
-                  <Draggable
-                    key={list._id}
-                    draggableId={list._id}
-                    index={index}
-                  >
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        <List data={list} />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </BoardContainer>
+      <Container>
+        <BoardToolbar title={board.title} />
+        <BoardContainer>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable
+              droppableId="droppable-board"
+              direction="horizontal"
+              type="list"
+            >
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  style={{
+                    display: "flex",
+                    margin: "20px",
+                  }}
+                >
+                  {board.lists.map((list, index) => (
+                    <Draggable
+                      key={list._id}
+                      draggableId={list._id}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <List data={list} />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </BoardContainer>
+      </Container>
     );
   } else if (boardStatus === "failed") {
     content = <div>{error}</div>;
   }
 
-  return (
-    <div>
-      <BoardToolbar />
-      {content}
-      <AddMemberForm />
-    </div>
-  );
+  return <div>{content}</div>;
 };

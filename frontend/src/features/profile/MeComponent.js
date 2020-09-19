@@ -5,6 +5,7 @@ import { selectProfile } from "./profileSlice";
 import styled from "styled-components";
 
 import Avatar from "@material-ui/core/Avatar";
+import { fullName, getInitials } from "../../utils/memberName";
 
 const MeContainer = styled.div`
   display: flex;
@@ -37,26 +38,10 @@ const StyledAvatar = styled(Avatar)`
 export const MeComponent = () => {
   const profile = useSelector(selectProfile);
 
-  const fullName = () => {
-    if (!profile.lastname) {
-      return profile.firstname.toUpperCase();
-    } else {
-      return `${profile.firstname} ${profile.lastname}`.toUpperCase();
-    }
-  };
-
-  const getInitials = () => {
-    if (!profile.lastname) {
-      return `${profile.firstname[0]}`.toUpperCase();
-    } else {
-      return `${profile.firstname[0]}${profile.lastname[0]}}`.toUpperCase();
-    }
-  };
-
   return (
     <MeContainer>
-      <StyledAvatar>{getInitials()}</StyledAvatar>
-      <Name>{fullName()}</Name>
+      <StyledAvatar>{getInitials(profile)}</StyledAvatar>
+      <Name>{fullName(profile)}</Name>
       <Email>{profile.email}</Email>
     </MeContainer>
   );

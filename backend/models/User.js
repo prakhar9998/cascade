@@ -27,7 +27,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       min: 8,
       max: 512,
-      select: false,
     },
   },
   { timestamps: true },
@@ -59,6 +58,7 @@ userSchema.statics.findByCredentials = async function (email, password) {
   }
 
   // matching passwords
+  console.log('user password', user);
   const isPasswordCorrect = await argon2.verify(user.password, password);
   if (!isPasswordCorrect) {
     throw new ErrorResponse('Email or password is invalid.', 400);

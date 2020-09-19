@@ -141,4 +141,4 @@ export const selectBoard = (state) => state.board.data;
 
 export const selectAllLists = (state) => state.board.data.lists;
 
-export const selectAllMembers = (state) => state.board.members;
+export const selectAllMembers = (state) => state.board.data.members;

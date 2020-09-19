@@ -10,6 +10,7 @@ const validEmailRegex = RegExp(
 
 const FormContainer = styled.div`
   border: 1px solid red;
+  background: white;
 `;
 
 export const AddMemberForm = () => {
