@@ -19,9 +19,9 @@ const Container = styled.div`
   border-radius: 5px;
   min-height: 100px;
   padding: 5px;
-  -webkit-box-shadow: 3px 3px 5px 3px #ccc;
-  -moz-box-shadow: 3px 3px 5px 3px #ccc;
-  box-shadow: 3px 3px 5px 3px #ccc;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
 `;
 const Heading = styled.h3`
   font-size: 20px;
@@ -57,7 +57,6 @@ const Time = styled.span`
 
 const CardContainer = styled.div`
   margin: 16px auto;
-  box-shadow: inset 0 0 100px -50px rgba(0, 0, 0, 0.2);
 
   width: 100%;
   min-height: 100px;

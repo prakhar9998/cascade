@@ -9,7 +9,6 @@ import {
   moveCardToList,
 } from "./boardSlice";
 
-import Container from "@material-ui/core/Container";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import styled from "styled-components";
 
@@ -38,7 +37,7 @@ export const Board = () => {
 
   useEffect(() => {
     console.log("mounted");
-    console.log("action", fetchBoard.pending);
+    console.log("action", fetchBoard.pending.type);
     dispatch(fetchBoard(id));
   }, [dispatch]);
 

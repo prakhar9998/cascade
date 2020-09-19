@@ -4,10 +4,13 @@ import { Card } from "./Card";
 
 import styled from "styled-components";
 
+import IconButton from "@material-ui/core/IconButton";
+import EditSharpIcon from "@material-ui/icons/EditSharp";
+
 const Container = styled.div`
-  border-radius: 7px;
+  border-radius: 4px;
   width: 275px;
-  background-color: #f5f5f5;
+  background-color: #eeedf0;
   padding: 0.3rem 0.5rem;
   margin: 0.5rem;
 `;
@@ -15,20 +18,36 @@ const Container = styled.div`
 const ListTitle = styled.h3`
   margin-left: 16px;
   font-size: 20px;
-  color: #131c27;
+  color: #161c2e;
+  flex-grow: 1;
 `;
 
-const Button = styled.button``;
-const Input = styled.input``;
-const Label = styled.label``;
+const ListHeader = styled.div`
+  display: flex;
+`;
+
+const EditButton = styled(IconButton)`
+  width: 50px;
+  height: 50px;
+  align-self: center;
+`;
 
 export const List = (props) => {
+  const handleEditTitle = () => {
+    // edits title and sends message through sockets
+  };
+
   return (
     <Container>
       <Droppable droppableId={props.data._id} type="card">
         {(provided, snapshot) => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
-            <ListTitle>{props.data.title}</ListTitle>
+            <ListHeader>
+              <ListTitle>{props.data.title}</ListTitle>
+              <EditButton aria-label="edit title" onClick={handleEditTitle}>
+                <EditSharpIcon />
+              </EditButton>
+            </ListHeader>
             {props.data.cards.map((card, index) => (
               <Card key={card._id} cardData={card} index={index} />
             ))}
