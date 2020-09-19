@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
 const Board = require('../models/Board');
+const User = require('../models/User');
+
 const ErrorResponse = require('../utils/errorResponse');
 
 const createBoard = async (board) => {
@@ -20,6 +22,8 @@ const getBoardData = async (boardId) => {
     {
       $match: { _id: mongoose.Types.ObjectId(boardId) },
     },
+    { $lookup: { from: 'users', localField: 'members', foreignField: '_id', as: 'members' } },
+    { $project: { 'members.password': 0 } },
     {
       $lookup: {
         from: 'lists',
@@ -32,13 +36,11 @@ const getBoardData = async (boardId) => {
               let: { listId: '$_id' },
               pipeline: [
                 { $match: { $expr: { $eq: ['$listId', '$$listId'] } } },
-                { $addFields: { id: '$_id' } },
                 { $sort: { order: 1 } },
               ],
               as: 'cards',
             },
           },
-          { $addFields: { id: '$_id' } },
           { $sort: { order: 1 } },
         ],
         as: 'lists',
@@ -75,4 +77,27 @@ const updateBoardData = async (board) => {
   return { board: boardRecord };
 };
 
-module.exports = { createBoard, getBoardData, getAllBoards, updateBoardData };
+const addMemberToBoard = async (data) => {
+  const userRecord = await User.findOne({ email: data.userEmail });
+  if (!userRecord) {
+    throw new ErrorResponse('User does not exist', 404);
+  }
+
+  const boardRecord = await Board.findById(data.boardId);
+  if (!boardRecord) {
+    throw new ErrorResponse('Board does not exist', 404);
+  }
+
+  const isAlreadyAdded = boardRecord.members.some((member) => {
+    return member.equals(userRecord._id);
+  });
+
+  if (!isAlreadyAdded) {
+    boardRecord.members.push(userRecord);
+    boardRecord.save();
+  }
+
+  return { board: boardRecord };
+};
+
+module.exports = { createBoard, getBoardData, getAllBoards, updateBoardData, addMemberToBoard };

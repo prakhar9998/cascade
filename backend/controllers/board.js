@@ -1,3 +1,4 @@
+const Joi = require('@hapi/joi');
 const asyncHandler = require('../middlewares/async');
 const ErrorResponse = require('../utils/errorResponse');
 const { createBoardValidation, updateBoardValidation } = require('../validation/boardValidation');
@@ -65,5 +66,24 @@ exports.deleteBoard = asyncHandler(async (req, res, next) => {
   }
 
   const board = await Board.deleteOne({ _id: boardId });
+  return res.status(200).json({ success: true, data: { ...board } });
+});
+
+exports.addMember = asyncHandler(async (req, res, next) => {
+  const { boardId } = req.params;
+  if (!boardId) {
+    return next(new ErrorResponse('Resource not specified', 400));
+  }
+
+  const schema = Joi.object({
+    email: Joi.string().required().email(),
+  });
+
+  const { value, error } = schema.validate(req.body);
+  if (error) {
+    return next(new ErrorResponse(error.message, 400));
+  }
+
+  const board = await boardService.addMemberToBoard({ boardId, userEmail: value.email });
   return res.status(200).json({ success: true, data: { ...board } });
 });
