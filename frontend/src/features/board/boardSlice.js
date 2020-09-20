@@ -60,24 +60,32 @@ const boardSlice = createSlice({
     addListToBoard(state, action) {
       const { title } = action.payload;
     },
-    changeCardPosition(state, action) {
-      const { source, destination, listId } = action.payload;
+    changeCardPosition: {
+      reducer(state, action) {
+        const { source, destination, listId } = action.payload.payload;
+        // finding list
+        const listIndex = state.data.lists.findIndex(
+          (list) => list._id === listId
+        );
 
-      // finding list
-      const listIndex = state.data.lists.findIndex(
-        (list) => list._id === listId
-      );
+        if (listIndex === -1) {
+          return;
+        }
 
-      if (listIndex === -1) {
-        return;
-      }
-
-      // reordering cards inplace (immer magic)
-      state.data.lists[listIndex].cards.splice(
-        destination,
-        0,
-        state.data.lists[listIndex].cards.splice(source, 1)[0]
-      );
+        // reordering cards inplace (immer magic)
+        state.data.lists[listIndex].cards.splice(
+          destination,
+          0,
+          state.data.lists[listIndex].cards.splice(source, 1)[0]
+        );
+      },
+      prepare(payload) {
+        // adding metadata for optimistic updates here
+        return {
+          payload: { payload },
+          meta: { isOptimistic: true },
+        };
+      },
     },
     moveCardToList(state, action) {
       const {
@@ -136,9 +144,9 @@ export const {
 
 export default boardSlice.reducer;
 
-// selectors
-export const selectBoard = (state) => state.board.data;
+// selectors (use state.current because of redux-optimistic-ui reducer enhancer)
+export const selectBoard = (state) => state.board.current.data;
 
-export const selectAllLists = (state) => state.board.data.lists;
+export const selectAllLists = (state) => state.board.current.data.lists;
 
-export const selectAllMembers = (state) => state.board.data.members;
+export const selectAllMembers = (state) => state.board.current.data.members;

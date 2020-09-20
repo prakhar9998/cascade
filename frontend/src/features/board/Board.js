@@ -28,12 +28,10 @@ export const Board = () => {
 
   const dispatch = useDispatch();
 
-  const boardStatus = useSelector((state) => state.board.status);
-  const error = useSelector((state) => state.board.error);
+  const boardStatus = useSelector((state) => state.board.current.status);
+  const error = useSelector((state) => state.board.current.error);
 
   useEffect(() => {
-    console.log("mounted");
-    console.log("action", fetchBoard.pending.type);
     dispatch(fetchBoard(id));
   }, [dispatch]);
 
@@ -60,19 +58,8 @@ export const Board = () => {
           source: source.index,
           destination: destination.index,
           listId: source.droppableId,
-        })
-      );
-      socket.emit(
-        "CHANGE_CARD_POSITION",
-        {
-          source: source.index,
-          destination: destination.index,
-          listId: source.droppableId,
           boardId: id,
-        },
-        (res) => {
-          console.log("socket response", res);
-        }
+        })
       );
     } else {
       dispatch(
