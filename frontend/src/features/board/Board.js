@@ -101,23 +101,27 @@ export const Board = () => {
                     margin: "20px",
                   }}
                 >
-                  {board.lists ? board.lists.map((list, index) => (
-                    <Draggable
-                      key={list._id}
-                      draggableId={list._id}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
-                          <List data={list} />
-                        </div>
-                      )}
-                    </Draggable>
-                  )) : <div></div>}
+                  {board.lists ? (
+                    board.lists.map((list, index) => (
+                      <Draggable
+                        key={list._id}
+                        draggableId={list._id}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <List data={list} />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))
+                  ) : (
+                    <div></div>
+                  )}
                   {provided.placeholder}
                 </div>
               )}

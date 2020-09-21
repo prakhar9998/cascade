@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import { Card } from "./Card";
 
@@ -6,6 +6,8 @@ import styled from "styled-components";
 
 import IconButton from "@material-ui/core/IconButton";
 import EditSharpIcon from "@material-ui/icons/EditSharp";
+
+import { AddCard } from "./AddCard";
 
 const Container = styled.div`
   border-radius: 4px;
@@ -48,13 +50,18 @@ export const List = (props) => {
                 <EditSharpIcon />
               </EditButton>
             </ListHeader>
-            {props.data.cards.map((card, index) => (
-              <Card key={card._id} cardData={card} index={index} />
-            ))}
+            {props.data.cards ? (
+              props.data.cards.map((card, index) => (
+                <Card key={card._id} cardData={card} index={index} />
+              ))
+            ) : (
+              <div></div>
+            )}
             {provided.placeholder}
           </div>
         )}
       </Droppable>
+      <AddCard listId={props.data._id} boardId={props.data.boardId} />
     </Container>
   );
 };

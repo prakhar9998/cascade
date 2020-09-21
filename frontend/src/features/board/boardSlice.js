@@ -28,11 +28,13 @@ export const addList = createAsyncThunk(
   "board/addList",
   async (payload, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${API_URL}/api/list/create`,
+      const res = await axios.post(
+        `${API_URL}/api/list/create`,
         { title: payload.title, boardId: payload.boardId },
         {
           withCredentials: true,
-        });
+        }
+      );
       console.log("shouldnt print");
       return res.data.data;
     } catch (err) {
@@ -45,15 +47,24 @@ export const addList = createAsyncThunk(
 
 export const addCard = createAsyncThunk(
   "board/addCard",
-  async (boardId, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${API_URL}/api/card/create`, {
-        withCredentials: true,
-      });
-      console.log(res);
+      const res = await axios.post(
+        `${API_URL}/api/card/create`,
+        {
+          title: payload.title,
+          listId: payload.listId,
+          boardId: payload.boardId,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(res.data.data);
+      return res.data.data;
     } catch (err) {
       const errMsg = APIErrorHandler(err);
-      rejectWithValue(errMsg);
+      return rejectWithValue(errMsg);
     }
   }
 );
@@ -62,9 +73,6 @@ const boardSlice = createSlice({
   name: "board",
   initialState,
   reducers: {
-    addListToBoard(state, action) {
-      const { title } = action.payload;
-    },
     changeCardPosition: {
       reducer(state, action) {
         const { source, destination, listId } = action.payload.payload;
@@ -131,7 +139,6 @@ const boardSlice = createSlice({
     // CRUD List
     [addList.fulfilled]: (state, action) => {
       // update lists array in the state
-      console.log("successfull list", action.payload);
       state.data.lists.push(action.payload);
       state.status = "succeeded";
     },
@@ -141,16 +148,24 @@ const boardSlice = createSlice({
 
     // CRUD Card
     [addCard.fulfilled]: (state, action) => {
+      const { listId } = action.payload;
+
+      // appending card at the bottom of the list
+      const listIndex = state.data.lists.findIndex(
+        (list) => list._id === listId
+      );
+
+      console.log("list index", listIndex);
+      console.log("list id", listId);
+      console.log("payload", action.payload);
+      state.data.lists[listIndex].cards.push(action.payload);
+
       state.status = "succeeded";
     },
   },
 });
 
-export const {
-  addListToBoard,
-  changeCardPosition,
-  moveCardToList,
-} = boardSlice.actions;
+export const { changeCardPosition, moveCardToList } = boardSlice.actions;
 
 export default boardSlice.reducer;
 
