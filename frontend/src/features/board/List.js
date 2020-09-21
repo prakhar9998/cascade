@@ -55,13 +55,12 @@ export const List = (props) => {
                 <Card key={card._id} cardData={card} index={index} />
               ))
             ) : (
-              <div></div>
+              <></>
             )}
             {provided.placeholder}
           </div>
         )}
       </Droppable>
-      <AddCard listId={props.data._id} boardId={props.data.boardId} />
     </Container>
   );
 };
