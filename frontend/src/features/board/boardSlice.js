@@ -6,7 +6,7 @@ import APIErrorHandler from "../../utils/APIErrorHandler";
 const initialState = {
   data: {},
   status: "idle",
-  error: null,
+  errors: null,
 };
 
 export const fetchBoard = createAsyncThunk(
@@ -26,14 +26,19 @@ export const fetchBoard = createAsyncThunk(
 
 export const addList = createAsyncThunk(
   "board/addList",
-  async (boardId, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${API_URL}/api/list/create`, {
-        withCredentials: true,
-      });
-      console.log(res);
+      const res = await axios.post(`${API_URL}/api/list/create`,
+        { title: payload.title, boardId: payload.boardId },
+        {
+          withCredentials: true,
+        });
+      console.log("shouldnt print");
+      return res.data.data;
     } catch (err) {
-      return err;
+      console.log("Erro from list create", err);
+      const errMsg = APIErrorHandler(err);
+      return rejectWithValue(errMsg);
     }
   }
 );
@@ -125,8 +130,13 @@ const boardSlice = createSlice({
 
     // CRUD List
     [addList.fulfilled]: (state, action) => {
-      // update list in the state
+      // update lists array in the state
+      console.log("successfull list", action.payload);
+      state.data.lists.push(action.payload);
       state.status = "succeeded";
+    },
+    [addList.rejected]: (state, action) => {
+      console.log("add list error", action.payload);
     },
 
     // CRUD Card

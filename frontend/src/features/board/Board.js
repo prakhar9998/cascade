@@ -15,6 +15,7 @@ import { useParams } from "react-router-dom";
 import { List } from "./List";
 import { BoardToolbar } from "./BoardToolbar";
 import { socket } from "../../socketClient/socketClient";
+import { AddList } from "./AddList";
 
 const BoardContainer = styled.div``;
 const Container = styled.div``;
@@ -100,7 +101,7 @@ export const Board = () => {
                     margin: "20px",
                   }}
                 >
-                  {board.lists.map((list, index) => (
+                  {board.lists ? board.lists.map((list, index) => (
                     <Draggable
                       key={list._id}
                       draggableId={list._id}
@@ -116,17 +117,18 @@ export const Board = () => {
                         </div>
                       )}
                     </Draggable>
-                  ))}
+                  )) : <div></div>}
                   {provided.placeholder}
                 </div>
               )}
             </Droppable>
           </DragDropContext>
+          <AddList boardId={id} />
         </BoardContainer>
       </Container>
     );
   } else if (boardStatus === "failed") {
-    content = <div>{error}</div>;
+    content = <div>Error: {error}</div>;
   }
 
   return <div>{content}</div>;
