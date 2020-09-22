@@ -86,6 +86,9 @@ const boardSlice = createSlice({
   name: "board",
   initialState,
   reducers: {
+    updateFullBoard(state, action) {
+      state.data = action.payload;
+    },
     changeCardPosition: {
       reducer(state, action) {
         const { source, destination, listId } = action.payload.payload;
@@ -182,7 +185,11 @@ const boardSlice = createSlice({
   },
 });
 
-export const { changeCardPosition, moveCardToList } = boardSlice.actions;
+export const {
+  changeCardPosition,
+  moveCardToList,
+  updateFullBoard,
+} = boardSlice.actions;
 
 export default boardSlice.reducer;
 

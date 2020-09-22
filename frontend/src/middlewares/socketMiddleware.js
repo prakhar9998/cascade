@@ -1,14 +1,15 @@
+import { updateFullBoard } from "../features/board/boardSlice";
 import { socket } from "../socketClient/socketClient";
 
 export default (store) => (next) => (action) => {
   switch (action.type) {
     case "board/fetchBoard/fulfilled": {
       // create socket listeners
-      console.log("payload", action.payload);
-      socket.on("test event", (data) => {
-        console.log("received", data);
+      socket.emit("join board room", action.payload._id);
+      socket.on("card updated", (res) => {
+        console.log("updated board", res.data.board);
+        store.dispatch(updateFullBoard(res.data.board));
       });
-      console.log("fetched boards middleware");
     }
   }
   return next(action);
