@@ -33,7 +33,7 @@ const Heading = styled.p`
 
 const StyledButton = styled(Button)``;
 
-export const AddBoard = () => {
+export const AddBoard = React.forwardRef((props, ref) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [addRequestStatus, setAddRequestStatus] = useState("idle");
@@ -93,4 +93,4 @@ export const AddBoard = () => {
       </StyledButton>
     </Container>
   );
-};
+});

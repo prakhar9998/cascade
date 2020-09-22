@@ -44,7 +44,6 @@ export const Board = () => {
   }
 
   const onDragEnd = (result) => {
-    console.log("drag ended");
     const { source, destination } = result;
 
     if (!destination) {

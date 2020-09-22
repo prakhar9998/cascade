@@ -72,7 +72,7 @@ export const BoardToolbar = (props) => {
     <BoardToolbarContainer>
       <BoardTitle>{props.title}</BoardTitle>
       {members.map((member) => (
-        <AvatarContainer>
+        <AvatarContainer key={member._id}>
           <StyledAvatar>{getInitials(member)}</StyledAvatar>
         </AvatarContainer>
       ))}
@@ -84,9 +84,13 @@ export const BoardToolbar = (props) => {
       >
         Add member
       </AddMemberButton>
-      <Modal open={modalOpen} onClose={handleModalClose}>
-        <AddMemberForm />
-      </Modal>
+
+      {/* uses react fragment to render modal, fixes the focus tabIndex issue */}
+      <>
+        <Modal open={modalOpen} onClose={handleModalClose}>
+          <AddMemberForm />
+        </Modal>
+      </>
     </BoardToolbarContainer>
   );
 };

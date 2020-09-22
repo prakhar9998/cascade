@@ -115,9 +115,13 @@ export const BoardsList = () => {
         </AddButton>
       </BoardsHeader>
       <Boards>{renderBoards}</Boards>
-      <Modal open={modalOpen} onClose={handleModalClose}>
-        <AddBoard />
-      </Modal>
+
+      {/* uses react fragment to render modal, fixes the focus tabIndex issue */}
+      <>
+        <Modal open={modalOpen} onClose={handleModalClose}>
+          <AddBoard />
+        </Modal>
+      </>
     </Container>
   );
 };

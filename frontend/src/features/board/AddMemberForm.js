@@ -13,7 +13,7 @@ const FormContainer = styled.div`
   background: white;
 `;
 
-export const AddMemberForm = () => {
+export const AddMemberForm = React.forwardRef((props, ref) => {
   const [email, setEmail] = useState("");
   const [isValid, setIsValid] = useState(false);
 
@@ -52,4 +52,4 @@ export const AddMemberForm = () => {
       </Button>
     </FormContainer>
   );
-};
+});
