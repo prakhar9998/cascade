@@ -69,6 +69,19 @@ export const addCard = createAsyncThunk(
   }
 );
 
+export const addMember = createAsyncThunk(
+  "board/addMember",
+  async (payload, { rejectWithValue }) => {
+    const { email, boardId } = payload;
+    const res = await axios.post(
+      `${API_URL}/api/board/${boardId}/addmember`,
+      { email },
+      { withCredentials: true }
+    );
+    return res.data.data;
+  }
+);
+
 const boardSlice = createSlice({
   name: "board",
   initialState,
@@ -161,6 +174,10 @@ const boardSlice = createSlice({
       state.data.lists[listIndex].cards.push(action.payload);
 
       state.status = "succeeded";
+    },
+
+    [addMember.fulfilled]: (state, action) => {
+      console.log("member added", action.payload);
     },
   },
 });

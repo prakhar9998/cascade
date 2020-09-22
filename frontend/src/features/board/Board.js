@@ -84,7 +84,7 @@ export const Board = () => {
   } else if (boardStatus === "succeeded") {
     content = (
       <Container>
-        <BoardToolbar title={board.title} />
+        <BoardToolbar title={board.title} boardId={board._id} />
         <BoardContainer>
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable

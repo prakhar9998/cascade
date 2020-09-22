@@ -88,7 +88,7 @@ export const BoardToolbar = (props) => {
       {/* uses react fragment to render modal, fixes the focus tabIndex issue */}
       <>
         <Modal open={modalOpen} onClose={handleModalClose}>
-          <AddMemberForm />
+          <AddMemberForm boardId={props.boardId} />
         </Modal>
       </>
     </BoardToolbarContainer>
