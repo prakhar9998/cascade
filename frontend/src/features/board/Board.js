@@ -14,11 +14,19 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { List } from "./List";
 import { BoardToolbar } from "./BoardToolbar";
-import { socket } from "../../socketClient/socketClient";
 import { AddList } from "./AddList";
 
-const BoardContainer = styled.div``;
-const Container = styled.div``;
+const BoardContainer = styled.div`
+  height: 100%;
+`;
+const Container = styled.div`
+  height: 100%;
+`;
+const ListsContainer = styled.div`
+  display: flex;
+  height: 100%;
+  margin: 20px;
+`;
 
 export const Board = () => {
   const [prevId, setPrevId] = useState(null);
@@ -93,13 +101,7 @@ export const Board = () => {
               type="list"
             >
               {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  style={{
-                    display: "flex",
-                    margin: "20px",
-                  }}
-                >
+                <ListsContainer ref={provided.innerRef}>
                   {board.lists ? (
                     board.lists.map((list, index) => (
                       <Draggable
@@ -112,6 +114,7 @@ export const Board = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
+                            style={{ height: "100%" }}
                           >
                             <List data={list} />
                           </div>
@@ -122,11 +125,11 @@ export const Board = () => {
                     <div></div>
                   )}
                   {provided.placeholder}
-                </div>
+                  <AddList boardId={id} />
+                </ListsContainer>
               )}
             </Droppable>
           </DragDropContext>
-          <AddList boardId={id} />
         </BoardContainer>
       </Container>
     );
@@ -134,5 +137,5 @@ export const Board = () => {
     content = <div>Error: {error}</div>;
   }
 
-  return <div>{content}</div>;
+  return <div style={{ flex: "1", overflow: "scroll" }}>{content}</div>;
 };

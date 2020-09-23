@@ -15,7 +15,6 @@ import styled from "styled-components";
 const BoardToolbarContainer = styled.div`
   width: 100%;
   height: 75px;
-  border: 1px solid red;
   display: flex;
   align-content: center;
 `;

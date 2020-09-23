@@ -50,6 +50,8 @@ export const List = (props) => {
                 <EditSharpIcon />
               </EditButton>
             </ListHeader>
+            <AddCard listId={props.data._id} boardId={props.data.boardId} />
+
             {props.data.cards ? (
               props.data.cards.map((card, index) => (
                 <Card key={card._id} cardData={card} index={index} />

@@ -59,7 +59,6 @@ const CardContainer = styled.div`
   margin: 16px auto;
 
   width: 100%;
-  border: 1px solid red;
 `;
 
 const useStyles = makeStyles((theme) => ({

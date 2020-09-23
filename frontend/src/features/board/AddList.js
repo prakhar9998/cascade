@@ -8,7 +8,9 @@ import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { addList } from "./boardSlice";
 
-const Container = styled.div``;
+const Container = styled.div`
+  width: 225px;
+`;
 const StyledIconButton = styled(IconButton)``;
 
 export const AddList = (props) => {

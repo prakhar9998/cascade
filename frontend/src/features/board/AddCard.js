@@ -22,11 +22,12 @@ const AddCardContainer = styled.div`
   background-color: #ffffff;
   display: flex;
   justify-content: center;
-  min-height: 75px;
+  min-height: 60px;
+  width: 250px;
 `;
 
 const AddCardText = styled.p`
-  font-size: 22px;
+  font-size: 18px;
   align-self: center;
 `;
 

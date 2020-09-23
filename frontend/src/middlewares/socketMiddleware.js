@@ -7,7 +7,6 @@ export default (store) => (next) => (action) => {
       // create socket listeners
       socket.emit("join board room", action.payload._id);
       socket.on("card updated", (res) => {
-        console.log("updated board", res.data.board);
         store.dispatch(updateFullBoard(res.data.board));
       });
     }

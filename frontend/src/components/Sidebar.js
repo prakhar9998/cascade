@@ -7,7 +7,6 @@ import Drawer from "@material-ui/core/Drawer";
 import Hidden from "@material-ui/core/Hidden";
 import IconButton from "@material-ui/core/IconButton";
 import FolderTwoToneIcon from "@material-ui/icons/FolderTwoTone";
-import SettingsApplicationsTwoToneIcon from "@material-ui/icons/SettingsApplicationsTwoTone";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -135,6 +134,9 @@ const ContentContainer = styled.main`
   width: 100%;
   height: 100vh;
   background: #f3f3f3;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid blue;
 `;
 
 const ToolbarSpace = styled.div`
