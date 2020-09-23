@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
+const Board = require('../models/Board');
 
 const Card = require('../models/Card');
+const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const boardService = require('./boardService');
 
@@ -117,4 +119,63 @@ const moveCardToList = async (source, destination, sourceListId, destinationList
   return { board: updatedBoard };
 };
 
-module.exports = { createCard, getCardData, updateCardData, changePositionInList, moveCardToList };
+const addLabel = async (cardId, name, color) => {
+  const cardRecord = await Card.findById(cardId);
+  if (!cardRecord) {
+    throw new ErrorResponse('Reource not found', 404);
+  }
+  cardRecord.labels.push({ name, color });
+  await cardRecord.save();
+
+  return { card: cardRecord };
+};
+
+const assignMember = async (data) => {
+  const { email, boardId, cardId } = data;
+
+  const userRecord = await User.findOne({ email });
+  if (!userRecord) {
+    throw new ErrorResponse('User does not exist', 404);
+  }
+
+  const boardRecord = await Board.findById(boardId);
+  if (!boardRecord) {
+    throw new ErrorResponse('Board does not exist', 404);
+  }
+
+  const isAMember = boardRecord.members.some((member) => {
+    return member.equals(userRecord._id);
+  });
+
+  if (!isAMember) {
+    throw new ErrorResponse('User is not member of the board', 400);
+  }
+
+  const cardRecord = await Card.findById(cardId);
+  if (!cardRecord) {
+    throw new ErrorResponse('Card does not exist', 404);
+  }
+
+  const isAlreadyAssigned = cardRecord.assigned.some((user) => {
+    return user.equals(userRecord._id);
+  });
+
+  if (isAlreadyAssigned) {
+    throw new ErrorResponse('User is already assigned this task.', 400);
+  }
+
+  cardRecord.assigned.push(userRecord);
+  await cardRecord.save();
+
+  return { card: cardRecord.populate(assigned) };
+};
+
+module.exports = {
+  createCard,
+  getCardData,
+  updateCardData,
+  changePositionInList,
+  moveCardToList,
+  addLabel,
+  assignMember,
+};

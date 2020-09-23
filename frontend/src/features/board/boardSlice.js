@@ -199,3 +199,6 @@ export const selectBoard = (state) => state.board.current.data;
 export const selectAllLists = (state) => state.board.current.data.lists;
 
 export const selectAllMembers = (state) => state.board.current.data.members;
+
+export const getMemberById = (state, userId) =>
+  state.board.current.data.members.find((member) => userId === member._id);

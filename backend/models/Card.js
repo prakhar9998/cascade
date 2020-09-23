@@ -31,7 +31,15 @@ const cardSchema = new mongoose.Schema({
   },
   labels: [
     {
-      type: String,
+      name: { type: String, required: true },
+      color: {
+        type: String,
+        validate: {
+          validator: (v) => /^#([0-9a-f]{3}){1,2}$/i.test(v),
+          message: (props) => `${props.value} is not a valid color hex value`,
+        },
+        required: true,
+      },
     },
   ],
   order: {

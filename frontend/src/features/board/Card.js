@@ -1,17 +1,21 @@
-import React from "react";
-
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { Draggable } from "react-beautiful-dnd";
 
 import Grid from "@material-ui/core/Grid";
 import CalendarTodaySharpIcon from "@material-ui/icons/CalendarTodaySharp";
 import Avatar from "@material-ui/core/Avatar";
 import AvatarGroup from "@material-ui/lab/AvatarGroup";
+import Modal from "@material-ui/core/Modal";
 import { makeStyles } from "@material-ui/core/styles";
 import { deepOrange, deepPurple } from "@material-ui/core/colors";
 
 import styled from "styled-components";
 
 import moment from "moment";
+import { CardDetail } from "./CardDetail";
+import { getMemberById } from "./boardSlice";
+import { getInitials } from "../../utils/memberName";
 
 const Container = styled.div`
   background-color: #ffffff;
@@ -27,10 +31,10 @@ const Heading = styled.h3`
   font-size: 20px;
   margin: 10px 0 0 10px;
 `;
-const Label = styled.div`
+export const Label = styled.div`
   display: inline-block;
   border-radius: 4px;
-  background-color: #edf8f2;
+  background-color: ${(props) => (props.color ? props.color : "#eeeeee")};
   color: #18a657;
   padding: 2px 5px;
   margin: 3px;
@@ -74,6 +78,9 @@ const useStyles = makeStyles((theme) => ({
   },
 
   group: {
+    float: "right",
+    paddingRight: "10px",
+    paddingBottom: "10px",
     "& > *": {
       width: theme.spacing(3.5),
       height: theme.spacing(3.5),
@@ -86,50 +93,76 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const MembersAvatar = (props) => {
+  const member = useSelector((state) => getMemberById(state, props.id));
+
+  return <Avatar>{getInitials(member)}</Avatar>;
+};
+
 export const Card = (props) => {
   const classes = useStyles();
 
+  const [modalOpen, setModalOpen] = useState(false);
+
+  // for add board form modal
+  const handleModalOpen = () => {
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
   return (
-    <CardContainer>
-      <Draggable draggableId={props.cardData._id} index={props.index}>
-        {(provided) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-          >
-            <Container key={props.cardData._id}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Heading>{props.cardData.title}</Heading>
-                </Grid>
-                <Grid item xs={12}>
-                  {props.cardData.labels.map((label, index) => (
-                    <Label key={index}>{label}</Label>
-                  ))}
-                </Grid>
-                <DateTimeContainer item xs={6}>
-                  <DateTime>
-                    <CalendarTodaySharpIcon fontSize={"inherit"} />
-                    <Time>
-                      {moment
-                        .utc(props.cardData.createdAt)
-                        .format("DD MMM, YYYY")}
-                    </Time>
-                  </DateTime>
-                </DateTimeContainer>
-                <Grid item xs={6}>
-                  <AvatarGroup max={4} className={classes.group} spacing={8}>
-                    {props.cardData.assigned.map((user) => (
-                      <Avatar>{user[0] + user.split(" ")[1][0]}</Avatar>
+    <div>
+      <CardContainer onClick={handleModalOpen}>
+        <Draggable draggableId={props.cardData._id} index={props.index}>
+          {(provided) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >
+              <Container key={props.cardData._id}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Heading>{props.cardData.title}</Heading>
+                  </Grid>
+                  <Grid item xs={12}>
+                    {props.cardData.labels.map((label, index) => (
+                      <Label key={index} color={label.color}>
+                        {label.name}
+                      </Label>
                     ))}
-                  </AvatarGroup>
+                  </Grid>
+                  <DateTimeContainer item xs={6}>
+                    <DateTime>
+                      <CalendarTodaySharpIcon fontSize={"inherit"} />
+                      <Time>
+                        {moment
+                          .utc(props.cardData.createdAt)
+                          .format("DD MMM, YYYY")}
+                      </Time>
+                    </DateTime>
+                  </DateTimeContainer>
+                  <Grid item xs={6}>
+                    <AvatarGroup max={4} className={classes.group} spacing={8}>
+                      {props.cardData.assigned.map((userId) => (
+                        <MembersAvatar key={userId} id={userId} />
+                      ))}
+                    </AvatarGroup>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Container>
-          </div>
-        )}
-      </Draggable>
-    </CardContainer>
+              </Container>
+            </div>
+          )}
+        </Draggable>
+      </CardContainer>
+      <>
+        <Modal open={modalOpen} onClose={handleModalClose}>
+          <CardDetail data={props.cardData} />
+        </Modal>
+      </>
+    </div>
   );
 };

@@ -1,3 +1,4 @@
+const Joi = require('@hapi/joi');
 const asyncHandler = require('../middlewares/async');
 const { createCardValidation, updateCardValidation } = require('../validation/cardValidation');
 const {
@@ -102,4 +103,36 @@ exports.moveCardToList = asyncHandler(async (req, res, next) => {
   );
 
   return res.status(200).json({ success: true, data: board });
+});
+
+exports.addLabel = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return next(new ErrorResponse('Resource not specified', 400));
+  }
+
+  const { name, color } = req.body;
+
+  if (!name || !color) {
+    return next(new ErrorResponse('Validation failed', 400));
+  }
+  const { card } = await cardService.addLabel(id, name, color);
+  return res.status(201).json({ success: true, data: card });
+});
+
+exports.assignMember = asyncHandler(async (req, res, next) => {
+  // validation
+  const { value, error } = Joi.object({
+    email: Joi.string().required().email(),
+    boardId: Joi.string().required(),
+    cardId: Joi.string().required(),
+  }).validate(req.body);
+
+  if (error) {
+    return next(new ErrorResponse(error.message, 400));
+  }
+
+  const { card } = await cardService.assignMember(value);
+  return res.status(200).json({ success: true, data: card });
 });
