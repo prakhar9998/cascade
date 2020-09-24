@@ -31,14 +31,17 @@ const Heading = styled.h3`
   font-size: 20px;
   margin: 10px 0 0 10px;
 `;
+
+// same styles using in card detail modal
 export const Label = styled.div`
   display: inline-block;
   border-radius: 4px;
   background-color: ${(props) => (props.color ? props.color : "#eeeeee")};
-  color: #18a657;
+  color: #2d3438;
   padding: 2px 5px;
   margin: 3px;
   font-size: 14px;
+  align-self: center;
 `;
 
 const DateTime = styled.div`

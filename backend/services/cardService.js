@@ -151,7 +151,7 @@ const assignMember = async (data) => {
     throw new ErrorResponse('User is not member of the board', 400);
   }
 
-  const cardRecord = await Card.findById(cardId);
+  const cardRecord = await Card.find({ _id: cardId });
   if (!cardRecord) {
     throw new ErrorResponse('Card does not exist', 404);
   }
@@ -167,7 +167,7 @@ const assignMember = async (data) => {
   cardRecord.assigned.push(userRecord);
   await cardRecord.save();
 
-  return { card: cardRecord.populate(assigned) };
+  return { card: cardRecord };
 };
 
 module.exports = {
