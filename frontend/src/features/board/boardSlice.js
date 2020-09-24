@@ -106,6 +106,19 @@ export const addLabelToCard = createAsyncThunk(
   }
 );
 
+export const assignMemberToCard = createAsyncThunk(
+  "board/assignMemberToCard",
+  async (payload) => {
+    const { email, boardId, cardId } = payload;
+    const res = await axios.post(
+      `${API_URL}/api/card/assign`,
+      { email, boardId, cardId },
+      { withCredentials: true }
+    );
+    return res.data.data;
+  }
+);
+
 const boardSlice = createSlice({
   name: "board",
   initialState,
@@ -212,8 +225,8 @@ const boardSlice = createSlice({
 
       state.data.lists[listIndex].cards.push(action.payload);
     },
+    // TODO: remove code duplication here
     [addLabelToCard.fulfilled]: (state, action) => {
-      console.log("fulfilled", action.payload);
       const { _id, listId } = action.payload;
 
       const listIndex = state.data.lists.findIndex(
@@ -225,6 +238,20 @@ const boardSlice = createSlice({
 
       if (cardIndex !== -1 && listIndex !== -1) {
         console.log("indexes", cardIndex, listIndex);
+        state.data.lists[listIndex].cards[cardIndex] = action.payload;
+      }
+    },
+    [assignMemberToCard.fulfilled]: (state, action) => {
+      const { _id, listId } = action.payload;
+
+      const listIndex = state.data.lists.findIndex(
+        (list) => list._id === listId
+      );
+      const cardIndex = state.data.lists[listIndex].cards.findIndex(
+        (card) => card._id === _id
+      );
+
+      if (cardIndex !== -1 && listIndex !== -1) {
         state.data.lists[listIndex].cards[cardIndex] = action.payload;
       }
     },

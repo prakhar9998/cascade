@@ -151,7 +151,7 @@ const assignMember = async (data) => {
     throw new ErrorResponse('User is not member of the board', 400);
   }
 
-  const cardRecord = await Card.find({ _id: cardId });
+  const cardRecord = await Card.findById(cardId);
   if (!cardRecord) {
     throw new ErrorResponse('Card does not exist', 404);
   }
