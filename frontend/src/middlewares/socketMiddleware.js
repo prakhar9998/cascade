@@ -6,7 +6,7 @@ export default (store) => (next) => (action) => {
     case "board/fetchBoard/fulfilled": {
       // create socket listeners
       socket.emit("join board room", action.payload._id);
-      socket.on("card updated", (res) => {
+      socket.on("board updated", (res) => {
         store.dispatch(updateFullBoard(res.data.board));
       });
     }

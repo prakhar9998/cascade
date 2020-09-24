@@ -6,6 +6,7 @@ import {
   changeCardPosition,
   moveCardToList,
   selectBoard,
+  changeListPosition,
 } from "./boardSlice";
 
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -18,6 +19,7 @@ import { AddList } from "./AddList";
 
 const BoardContainer = styled.div`
   height: 100%;
+  display: flex;
 `;
 const Container = styled.div`
   height: 100%;
@@ -52,30 +54,44 @@ export const Board = () => {
   }
 
   const onDragEnd = (result) => {
-    const { source, destination } = result;
+    console.log("drag ended", result);
+    const { source, destination, type } = result;
 
     if (!destination) {
       return;
     }
 
-    const inSameList = source.droppableId === destination.droppableId;
+    if (type === "card") {
+      const inSameList = source.droppableId === destination.droppableId;
 
-    if (inSameList) {
+      if (inSameList) {
+        console.log("change card");
+        dispatch(
+          changeCardPosition({
+            source: source.index,
+            destination: destination.index,
+            listId: source.droppableId,
+            boardId: id,
+          })
+        );
+      } else {
+        console.log("move card");
+        dispatch(
+          moveCardToList({
+            source: source.index,
+            destination: destination.index,
+            sourceListId: source.droppableId,
+            destinationListId: destination.droppableId,
+            boardId: id,
+          })
+        );
+      }
+    } else if (type === "list") {
       dispatch(
-        changeCardPosition({
+        changeListPosition({
           source: source.index,
           destination: destination.index,
-          listId: source.droppableId,
           boardId: id,
-        })
-      );
-    } else {
-      dispatch(
-        moveCardToList({
-          source: source.index,
-          destination: destination.index,
-          sourceListId: source.droppableId,
-          destinationListId: destination.droppableId,
         })
       );
     }
@@ -114,7 +130,6 @@ export const Board = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            style={{ height: "100%" }}
                           >
                             <List data={list} />
                           </div>
@@ -125,11 +140,11 @@ export const Board = () => {
                     <div></div>
                   )}
                   {provided.placeholder}
-                  <AddList boardId={id} />
                 </ListsContainer>
               )}
             </Droppable>
           </DragDropContext>
+          <AddList boardId={id} />
         </BoardContainer>
       </Container>
     );

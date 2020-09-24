@@ -48,5 +48,52 @@ export default (store) => (next) => (action) => {
         });
       }
     );
+  } else if (type === "board/moveCardToList") {
+    console.log("move card initiated");
+    socket.emit(
+      "MOVE_CARD_TO_LIST",
+      {
+        source: payload.payload.source,
+        destination: payload.payload.destination,
+        destinationListId: payload.payload.destinationListId,
+        sourceListId: payload.payload.sourceListId,
+        boardId: payload.payload.boardId,
+      },
+      (error) => {
+        console.log("move card error", error);
+        next({
+          type: type + (error ? _ERROR : _SUCCESS),
+          error,
+          payload,
+          meta: {
+            optimistic: error
+              ? { type: REVERT, id: transactionID }
+              : { type: COMMIT, id: transactionID },
+          },
+        });
+      }
+    );
+  } else if (type === "board/changeListPosition") {
+    socket.emit(
+      "CHANGE_LIST_POSITION",
+      {
+        source: payload.payload.source,
+        destination: payload.payload.destination,
+        boardId: payload.payload.boardId,
+      },
+      (error) => {
+        console.log("reorder list error", error);
+        next({
+          type: type + (error ? _ERROR : _SUCCESS),
+          error,
+          payload,
+          meta: {
+            optimistic: error
+              ? { type: REVERT, id: transactionID }
+              : { type: COMMIT, id: transactionID },
+          },
+        });
+      }
+    );
   }
 };

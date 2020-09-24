@@ -6,8 +6,13 @@ const User = require('../models/User');
 const Board = require('../models/Board');
 
 const cardService = require('../services/cardService');
-const { updatePositionValidation } = require('../validation/dragDropValidation');
+const {
+  updatePositionValidation,
+  listsPostionUpdateValidation,
+  moveCardValidation,
+} = require('../validation/dragDropValidation');
 const ErrorResponse = require('../utils/errorResponse');
+const listService = require('../services/listService');
 
 const io = socketIo();
 const socketApi = {};
@@ -88,10 +93,64 @@ io.on('connection', (socket) => {
         value.boardId,
       );
       console.log('boardId', value.boardId);
-      socket.to(value.boardId).emit('card updated', { data: board });
+      socket.to(value.boardId).emit('board updated', { data: board });
       return callback('');
     } catch (err) {
       return callback('server error');
+    }
+  });
+
+  socket.on('MOVE_CARD_TO_LIST', async (data, callback) => {
+    const { value, error } = moveCardValidation(data);
+    if (error) {
+      return callback('error');
+    }
+
+    // check if user has permission to make changes to this board.
+    if (!checkBoardPermission(data.boardId, socket.decodedUser._id)) {
+      return callback('permission denied');
+    }
+
+    try {
+      const { board } = await cardService.moveCardToList(
+        value.source,
+        value.destination,
+        value.sourceListId,
+        value.destinationListId,
+        value.boardId,
+      );
+
+      socket.to(value.boardId).emit('board updated', { data: board });
+      console.log('card moved');
+      return callback('');
+    } catch (err) {
+      return callback('error');
+    }
+  });
+
+  socket.on('CHANGE_LIST_POSITION', async (data, callback) => {
+    console.log('changing list');
+    const { value, error } = listsPostionUpdateValidation(data);
+    if (error) {
+      return callback('error');
+    }
+
+    // check if user has permission to make changes to this board.
+    if (!checkBoardPermission(data.boardId, socket.decodedUser._id)) {
+      return callback('permission denied');
+    }
+
+    try {
+      const { board } = await listService.changePosition(
+        value.source,
+        value.destination,
+        value.boardId,
+      );
+      socket.to(value.boardId).emit('board updated', { data: board });
+      return callback('');
+    } catch (err) {
+      console.log(err);
+      return callback('failed');
     }
   });
 

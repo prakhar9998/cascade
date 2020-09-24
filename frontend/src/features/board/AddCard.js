@@ -24,10 +24,11 @@ const AddCardContainer = styled.div`
   justify-content: center;
   min-height: 60px;
   width: 250px;
+  border-radius: 10px;
 `;
 
 const AddCardText = styled.p`
-  font-size: 18px;
+  font-size: 15px;
   align-self: center;
 `;
 
@@ -36,7 +37,6 @@ const CardFormContainer = styled.div``;
 const CreateButton = styled(Button)`
   && {
     font-size: 10px;
-    margin: 10px;
   }
 `;
 

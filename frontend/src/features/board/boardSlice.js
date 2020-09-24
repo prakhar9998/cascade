@@ -153,26 +153,61 @@ const boardSlice = createSlice({
         };
       },
     },
-    moveCardToList(state, action) {
-      const {
-        source,
-        destination,
-        sourceListId,
-        destinationListId,
-      } = action.payload;
+    moveCardToList: {
+      reducer(state, action) {
+        const {
+          source,
+          destination,
+          sourceListId,
+          destinationListId,
+        } = action.payload.payload;
 
-      const srcListIndex = state.data.lists.findIndex(
-        (list) => list._id === sourceListId
-      );
-      const desListIndex = state.data.lists.findIndex(
-        (list) => list._id === destinationListId
-      );
+        console.log("move card action", action.payload);
 
-      state.data.lists[desListIndex].cards.splice(
-        destination,
-        0,
-        state.data.lists[srcListIndex].cards.splice(source, 1)[0]
-      );
+        const srcListIndex = state.data.lists.findIndex(
+          (list) => list._id === sourceListId
+        );
+        const desListIndex = state.data.lists.findIndex(
+          (list) => list._id === destinationListId
+        );
+
+        if (state.data.lists[desListIndex]) {
+          state.data.lists[desListIndex].cards.splice(
+            destination,
+            0,
+            state.data.lists[srcListIndex].cards.splice(source, 1)[0]
+          );
+        } else {
+          state.data.lists[desListIndex].cards = [
+            state.data.lists[srcListIndex].cards.splice(source, 1)[0],
+          ];
+        }
+      },
+      prepare(payload) {
+        return {
+          payload: { payload },
+          meta: { isOptimistic: true },
+        };
+      },
+    },
+    changeListPosition: {
+      reducer(state, action) {
+        const { source, destination } = action.payload.payload;
+
+        // reordering lists inplace
+        state.data.lists.splice(
+          destination,
+          0,
+          state.data.lists.splice(source, 1)[0]
+        );
+      },
+      prepare(payload) {
+        // adding metadata for optimistic updates here
+        return {
+          payload: { payload },
+          meta: { isOptimistic: true },
+        };
+      },
     },
   },
   extraReducers: {
@@ -262,6 +297,7 @@ export const {
   changeCardPosition,
   moveCardToList,
   updateFullBoard,
+  changeListPosition,
 } = boardSlice.actions;
 
 export default boardSlice.reducer;

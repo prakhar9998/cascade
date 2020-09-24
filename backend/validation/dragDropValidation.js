@@ -22,3 +22,13 @@ exports.moveCardValidation = (data) => {
 
   return schema.validate(data);
 };
+
+exports.listsPostionUpdateValidation = (data) => {
+  const schema = Joi.object({
+    source: Joi.number().required(),
+    destination: Joi.number().required(),
+    boardId: Joi.string().required(),
+  });
+
+  return schema.validate(data);
+};
