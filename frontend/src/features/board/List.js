@@ -6,8 +6,13 @@ import styled from "styled-components";
 
 import IconButton from "@material-ui/core/IconButton";
 import EditSharpIcon from "@material-ui/icons/EditSharp";
+import DoneIcon from "@material-ui/icons/Done";
+import CloseIcon from "@material-ui/icons/Close";
+import TextField from "@material-ui/core/TextField";
 
 import { AddCard } from "./AddCard";
+import { useDispatch } from "react-redux";
+import { updateListTitle } from "./boardSlice";
 
 const Container = styled.div`
   border-radius: 4px;
@@ -24,6 +29,17 @@ const ListTitle = styled.h3`
   flex-grow: 1;
 `;
 
+const StyledTextField = styled(TextField)`
+  && {
+    margin-left: 16px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    font-size: 20px;
+    color: #161c2e;
+    flex-grow: 1;
+  }
+`;
+
 const ListHeader = styled.div`
   display: flex;
 `;
@@ -35,8 +51,25 @@ const EditButton = styled(IconButton)`
 `;
 
 export const List = (props) => {
-  const handleEditTitle = () => {
-    // edits title and sends message through sockets
+  const [editOpen, setEditOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState(props.data.title);
+  const dispatch = useDispatch();
+
+  const handleEditTitle = () => setEditOpen(true);
+
+  const handleTitleChange = (e) => setNewTitle(e.target.value);
+
+  const handleTitleSubmit = async () => {
+    try {
+      if (newTitle !== props.data.title) {
+        const res = await dispatch(
+          updateListTitle({ listId: props.data._id, title: newTitle })
+        );
+      }
+      setEditOpen(false);
+    } catch (err) {
+      console.log("error in updating list", err);
+    }
   };
 
   return (
@@ -45,10 +78,27 @@ export const List = (props) => {
         {(provided, snapshot) => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
             <ListHeader>
-              <ListTitle>{props.data.title}</ListTitle>
-              <EditButton aria-label="edit title" onClick={handleEditTitle}>
-                <EditSharpIcon />
-              </EditButton>
+              {editOpen ? (
+                <>
+                  <StyledTextField
+                    value={newTitle}
+                    onChange={handleTitleChange}
+                  ></StyledTextField>
+                  <EditButton onClick={handleTitleSubmit}>
+                    <DoneIcon />
+                  </EditButton>
+                  <EditButton onClick={() => setEditOpen(false)}>
+                    <CloseIcon />
+                  </EditButton>
+                </>
+              ) : (
+                <>
+                  <ListTitle>{props.data.title}</ListTitle>
+                  <EditButton aria-label="edit title" onClick={handleEditTitle}>
+                    <EditSharpIcon />
+                  </EditButton>
+                </>
+              )}
             </ListHeader>
             <AddCard listId={props.data._id} boardId={props.data.boardId} />
 

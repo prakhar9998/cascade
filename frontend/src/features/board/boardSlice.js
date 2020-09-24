@@ -35,13 +35,24 @@ export const addList = createAsyncThunk(
           withCredentials: true,
         }
       );
-      console.log("shouldnt print");
       return res.data.data;
     } catch (err) {
-      console.log("Erro from list create", err);
       const errMsg = APIErrorHandler(err);
       return rejectWithValue(errMsg);
     }
+  }
+);
+
+export const updateListTitle = createAsyncThunk(
+  "board/updateListTitle",
+  async (payload) => {
+    const { listId, title } = payload;
+    const res = await axios.put(
+      `${API_URL}/api/list/${listId}`,
+      { title },
+      { withCredentials: true }
+    );
+    return res.data.data;
   }
 );
 
@@ -71,11 +82,24 @@ export const addCard = createAsyncThunk(
 
 export const addMember = createAsyncThunk(
   "board/addMember",
-  async (payload, { rejectWithValue }) => {
+  async (payload) => {
     const { email, boardId } = payload;
     const res = await axios.post(
       `${API_URL}/api/board/${boardId}/addmember`,
       { email },
+      { withCredentials: true }
+    );
+    return res.data.data;
+  }
+);
+
+export const addLabelToCard = createAsyncThunk(
+  "board/addLabelToCard",
+  async (payload) => {
+    const { name, color, cardId } = payload;
+    const res = await axios.post(
+      `${API_URL}/api/card/${cardId}/addlabel`,
+      { name, color },
       { withCredentials: true }
     );
     return res.data.data;
@@ -152,6 +176,11 @@ const boardSlice = createSlice({
       state.error = action.payload;
     },
 
+    [addMember.fulfilled]: (state, action) => {
+      state.data = action.payload;
+      console.log("member added", action.payload);
+    },
+
     // CRUD List
     [addList.fulfilled]: (state, action) => {
       // update lists array in the state
@@ -160,6 +189,16 @@ const boardSlice = createSlice({
     },
     [addList.rejected]: (state, action) => {
       console.log("add list error", action.payload);
+    },
+    [updateListTitle.fulfilled]: (state, action) => {
+      const listIndex = state.data.lists.findIndex(
+        (list) => list._id === action.payload.id
+      );
+      console.log("index list", listIndex);
+      console.log("action ", action.payload);
+      if (listIndex !== -1) {
+        state.data.lists[listIndex].title = action.payload.title;
+      }
     },
 
     // CRUD Card
@@ -171,16 +210,23 @@ const boardSlice = createSlice({
         (list) => list._id === listId
       );
 
-      console.log("list index", listIndex);
-      console.log("list id", listId);
-      console.log("payload", action.payload);
       state.data.lists[listIndex].cards.push(action.payload);
-
-      state.status = "succeeded";
     },
+    [addLabelToCard.fulfilled]: (state, action) => {
+      console.log("fulfilled", action.payload);
+      const { _id, listId } = action.payload;
 
-    [addMember.fulfilled]: (state, action) => {
-      console.log("member added", action.payload);
+      const listIndex = state.data.lists.findIndex(
+        (list) => list._id === listId
+      );
+      const cardIndex = state.data.lists[listIndex].cards.findIndex(
+        (card) => card._id === _id
+      );
+
+      if (cardIndex !== -1 && listIndex !== -1) {
+        console.log("indexes", cardIndex, listIndex);
+        state.data.lists[listIndex].cards[cardIndex] = action.payload;
+      }
     },
   },
 });
